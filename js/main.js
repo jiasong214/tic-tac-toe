@@ -88,7 +88,7 @@ const player = {
   },
 
   activatePlayerForm: function() {
-    $("#form-bg").attr("class", "active");
+    $("#gameSettingScreen").attr("class", "active");
   },
 
   updateDOM: function() {
@@ -100,7 +100,7 @@ const player = {
 
 }
 // form submit event
-$("#gameSettingForm").on("submit", function(event) {
+$("#playerInfoForm").on("submit", function(event) {
   event.preventDefault();
 
   const player1Name = $("#player1Name").val() || "Player1";
@@ -113,7 +113,7 @@ $("#gameSettingForm").on("submit", function(event) {
   player.changePlayersMark(player1Mark, player2Mark);
   player.updateDOM();
 
-  $("#form-bg").attr("class", "");
+  $("#gameSettingScreen").attr("class", "");
 
   const boardSize = parseInt($("#boardSize").val());
 
@@ -287,13 +287,13 @@ const game = {
 
     // delay for animation
     setTimeout(() => {
-      $("#winner-bg").css("display", "block");
+      $("#resultScreen").css("display", "block");
 
       if(winner === undefined) {
         $("#winner-bg p").html(`Draw!`);
       }else {
-        $("#winner-bg p").html(`${winner.name} won!`);
-        $(".playersInfo img").css("filter", "brightness(0.2)");
+        $(".resultScreen__text").html(`${winner.name} wins!`);
+        $(".playersBar__player img").css("filter", "brightness(0.2)");
         $(`#player${winner.id} img`).css({
           "width": "360px",
           "filter": "none",
@@ -306,8 +306,8 @@ const game = {
   },
 
   cleanResultDOM: function() {
-    $("#winner-bg").css("display", "none");
-    $(".playersInfo img").css({
+    $("#resultScreen").css("display", "none");
+    $(".playersBar__player img").css({
       "filter": "none",
       "width": "180px",
     });

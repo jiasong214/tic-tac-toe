@@ -1,0 +1,107 @@
+#gameSettingScreen {
+  width: 100vw;
+  height: 100vh;
+  background: var(--yellow-color);
+  border: 100px solid var(--blue-color);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 52;
+  transform: translate(100%, -100%) rotate(180deg);
+  transition: border-width 1s, transform 1s 1s;
+}
+
+/* with the "active" class, it will on the screen */
+#gameSettingScreen.active {
+  transform: translate(0, 0) rotate(0deg);
+  border: 20px solid var(--blue-color);
+}
+
+#gameSettingScreen.active #playerInfoForm {
+  opacity: 1;
+}
+
+.gameSettingScreen__title {
+  font-size: 200px;
+  color: var(--blue-color);
+  line-height: 0.9;
+  text-shadow: 7px 7px var(--red-color);
+}
+
+.gameSettingScreen__img {
+  width: 40vw;
+  position: absolute;
+  bottom: -9%;
+  right: -3%;
+  transform: scaleX(-1);
+}
+
+#playerInfoForm {
+  width: 500px;
+  padding: 50px 100px;
+  background: white;
+  border: 3px solid black;
+  box-shadow: 10px 10px var(--blue-color);
+  opacity: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transition: 0.3s;
+}
+
+#playerInfoForm > * {
+  margin-bottom: 50px;
+}
+
+#playerInfoForm h2 {
+  margin-bottom: 20px;
+  border-bottom: 3px dashed gray;
+  font-size: 14px;
+  color: gray;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1;
+}
+
+#playerInfoForm input {
+  all: unset;
+  display: block;
+  width: 300px;
+  margin: 0 auto 10px;
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 10px;
+}
+
+#playerInfoForm select {
+  display: block;
+  width: 300px;
+  margin: 0 auto;
+  padding: 10px;
+  border-radius: 10px;
+}
+
+#playerInfoForm button {
+  all: unset;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: black;
+  box-shadow: 5px 5px var(--yellow-color);
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  top: 0px;
+  left: 0px;
+  transition: 0.3s;
+}
+#playerInfoForm button:hover {
+  box-shadow: none;
+  top: 2px;
+  left: 2px;
+  transition: 0.3s;
+}

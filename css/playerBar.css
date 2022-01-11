@@ -1,0 +1,43 @@
+#playersBar {
+  width: 100vw;
+  padding: 10px 50px;
+  background: var(--yellow-color);
+  border: 20px solid var(--blue-color);
+  border-top: 10px solid var(--red-color);
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  z-index: 51;
+}
+
+.playersBar__player {
+  width: 200px;
+  padding: 5px 0;
+  position: relative;
+}
+
+.playersBar__player img {
+  display: block;
+  width: 180px;
+  position: absolute;
+  left: 50%;
+  bottom: 85px;
+  transform: translateX(-50%);
+  transition: width 0.5s;
+}
+.playersBar__player h2 {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: 400;
+  text-align: center;
+}
+
+.playersBar__player p {
+  width: 30px;
+  height: 30px;
+  font-size: 28px;
+  text-align: center;
+  margin: 0 auto;
+}

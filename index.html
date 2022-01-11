@@ -7,41 +7,49 @@
   <script src="js/jquery.js"></script>
   <script defer src="js/main.js"></script>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/board.css">
+  <link rel="stylesheet" href="css/playerBar.css">
+  <link rel="stylesheet" href="css/gameSettingScreen.css">
+  <link rel="stylesheet" href="css/resultScreen.css">
   <title>Document</title>
 </head>
 <body>
   <header>
-    <h1 class="gameTitle">Tic Tac Toe</h1>
-    <button>Stop</button>
+    <h1 class="header__title">Tic Tac Toe</h1>
+    <button class="header__exitBtn" id="stopGameBtn">Stop</button>
   </header>
+
   <main>
     <div id="board">
     </div>
 
-    <div class="playersInfo">
-      <div id="player1">
+    <div id="playersBar">
+      <div id="player1" class="playersBar__player">
         <img src="images/person1.png" alt="">
         <h2>Player1</h2>
         <p>O</p>
       </div>
     
-      <div id="player2">
+      <div id="player2" class="playersBar__player">
         <img src="images/person2.png" alt="">
         <h2>Player2</h2>
         <p>X</p>
       </div>
     </div>
 
-    <div id="form-bg" class="active">
-      <h2>TIC<br/>TAC<br/>TOE</h2>
-      <img src="https://assets.website-files.com/5e51b3b0337309d672efd94c/5e53682233d368dfa63e7deb_slider-1.svg" alt="">
+    <div id="gameSettingScreen" class="active">
+      <h2 class="gameSettingScreen__title">
+        TIC<br/>TAC<br/>TOE
+      </h2>
+      <img class="gameSettingScreen__img" src="https://assets.website-files.com/5e51b3b0337309d672efd94c/5e53682233d368dfa63e7deb_slider-1.svg" alt="">
+
       <!-- <div class="buttons-wrapper">
         <button id="">Play with a Friend</button>
         <button id="">Play with AI</button>
       </div> -->
 
-      <div class="gameSettingForm-wrapper">
-        <form id="gameSettingForm">
+      <div class="playerInfoForm-wrapper">
+        <form id="playerInfoForm">
           <div>
             <h2>Player 1</h2>
             <input type="text" id="player1Name" placeholder="Player1 name">
@@ -51,6 +59,7 @@
               <option value="🥰">🥰</option>
             </select>
           </div>
+
           <div>
             <h2>Player 2</h2>
             <input type="text" id="player2Name" placeholder="Player2 name">
@@ -60,9 +69,10 @@
               <option value="🤢">🤢</option>
             </select>
           </div>
+
           <div>
-            <h2>GRID</h2>
-            <select name="" id="boardSize">
+            <h2>board size</h2>
+            <select id="boardSize">
               <option value="3">3</option>
               <option value="4">4</option>
               <option value="5">5</option>
@@ -72,22 +82,27 @@
               <option value="9">9</option>
             </select>
           </div>
+
           <button type="submit">Play</button>
         </form>
       </div>
 
     </div>
 
-    <div id="winner-bg">
-      <div class="winner-wrapper">
-        <p>Won!</p>
-        <div class="buttons-wrapper">
+    <div id="resultScreen">
+      <div class="resultScreen-wrapper">
+        <p class='resultScreen__text'>Won!</p>
+        <div class="resultScreen__buttons">
           <button id="playAgainBtn">Play again</button>
-          <button id="playNewGameBtn">Play new game</button>
+          <button id="playNewGameBtn">Play a new game</button>
         </div>
       </div>
     </div>
 
   </main>
+
+  <footer>
+    &copy; Jia Song
+  </footer>
 </body>
 </html>
