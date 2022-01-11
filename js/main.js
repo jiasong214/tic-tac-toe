@@ -2,12 +2,15 @@
 const board = {
   gameBoard: [],
 
+  boardSize: 3,
+
   // create a game board depends on arguments value
   initialise: function(size) {
     this.gameBoard = [];
+    this.boardSize = size || this.boardSize;
 
-    for(let i=0; i<size; i++) {
-      let rowArr = new Array(size).fill("");
+    for(let i=0; i<this.boardSize; i++) {
+      let rowArr = new Array(this.boardSize).fill("");
     
       this.gameBoard.push(rowArr);
     }
@@ -57,8 +60,7 @@ const board = {
   }
 }
 
-board.initialise(3);
-board.drawDOM();
+
 
 // 2. set players
 const player = {
@@ -112,6 +114,11 @@ $("#gameSettingForm").on("submit", function(event) {
   player.updateDOM();
 
   $("#form-bg").attr("class", "");
+
+  const boardSize = parseInt($("#boardSize").val());
+
+  board.initialise(boardSize);
+  board.drawDOM();
 });
 
 
@@ -274,7 +281,7 @@ const game = {
     }
   },
 
-  displayWinner: function(winner) {
+  displayResult: function(winner) {
     // block click event
     $("#board").css("pointer-events", "none");
 
@@ -298,7 +305,7 @@ const game = {
 
   },
 
-  cleanDOM: function() {
+  cleanResultDOM: function() {
     $("#winner-bg").css("display", "none");
     $(".playersInfo img").css({
       "filter": "none",
@@ -325,13 +332,13 @@ const game = {
     if(this.checkWin() !== undefined) {
       const matchedPiecesArr = this.checkWin();
       board.markResult(matchedPiecesArr);
-      this.displayWinner(this.currentPlayer);
+      this.displayResult(this.currentPlayer);
 
       return null;
     }
 
     if(this.checkDraw()) {
-      this.displayWinner();
+      this.displayResult();
 
       return null;
     }
@@ -342,14 +349,14 @@ const game = {
 }
 
 $("#playAgainBtn").on("click", function() {
-  board.initialise(3);
-  board.drawDOM(0);
-  game.cleanDOM();
+  board.initialise();
+  board.drawDOM();
+  game.cleanResultDOM();
 });
 
 $("#playNewGameBtn").on("click", function() {
-  board.initialise(3);
-  board.drawDOM(0);
-  game.cleanDOM();
+  // board.initialise();
+  // board.drawDOM();
+  game.cleanResultDOM();
   player.activatePlayerForm();
 });
