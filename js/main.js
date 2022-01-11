@@ -4,6 +4,8 @@ const board = {
 
   // create a game board depends on arguments value
   initialise: function(size) {
+    this.gameBoard = [];
+
     for(let i=0; i<size; i++) {
       let rowArr = new Array(size).fill("");
     
@@ -50,7 +52,7 @@ const board = {
 
   markResult: function(resultArr) {
     for(let item of resultArr) {
-      $(`.${item[0]}-${item[1]}`).css("background", "purple");
+      $(`.${item[0]}-${item[1]}`).css("background", "rgb(214, 51, 51)");
     }
   }
 }
@@ -62,10 +64,12 @@ board.drawDOM();
 const player = {
   players: {
     player1: {
+      id: 1,
       name: "PLAYER1",
       mark: "o"
     },
     player2: {
+      id: 2,
       name: "PLAYER2",
       mark: "x"
     }
@@ -81,12 +85,17 @@ const player = {
     this.players.player2.mark = player2Mark;
   },
 
+  activatePlayerForm: function() {
+    $("#form-bg").attr("class", "active");
+  },
+
   updateDOM: function() {
-    $("#player1Info > h2").html(this.players.player1.name);
-    $("#player1Info > p").html(this.players.player1.mark);
-    $("#player2Info > h2").html(this.players.player2.name);
-    $("#player2Info > p").html(this.players.player2.mark);
+    $("#player1 > h2").html(this.players.player1.name);
+    $("#player1 > p").html(this.players.player1.mark);
+    $("#player2 > h2").html(this.players.player2.name);
+    $("#player2 > p").html(this.players.player2.mark);
   }
+
 }
 // form submit event
 $("#gameSettingForm").on("submit", function(event) {
@@ -117,7 +126,6 @@ const game = {
       this.currentPlayer = player.players.player1;
     }
   },
-
 
   checkWin: function() {
     const currentBoard = board.gameBoard;
@@ -260,10 +268,42 @@ const game = {
         }
 
         if(counter >= totalPieces - 1) {
-          console.log("draw")
+          return true;
         }
       }
     }
+  },
+
+  displayWinner: function(winner) {
+    // block click event
+    $("#board").css("pointer-events", "none");
+
+    // delay for animation
+    setTimeout(() => {
+      $("#winner-bg").css("display", "block");
+
+      if(winner === undefined) {
+        $("#winner-bg p").html(`Draw!`);
+      }else {
+        $("#winner-bg p").html(`${winner.name} won!`);
+        $(".playersInfo img").css("filter", "brightness(0.2)");
+        $(`#player${winner.id} img`).css({
+          "width": "360px",
+          "filter": "none",
+        });
+      }
+      $("#board").css("pointer-events", "auto");
+    }, 500);
+
+
+  },
+
+  cleanDOM: function() {
+    $("#winner-bg").css("display", "none");
+    $(".playersInfo img").css({
+      "filter": "none",
+      "width": "180px",
+    });
   },
 
   clickBoard: function(boardID) {
@@ -273,7 +313,7 @@ const game = {
     // mark the board.gameBoard 
     const isMarked = board.mark(columnID, rowID, this.currentPlayer);
 
-    // if the ? was already marked, return null
+    // if the piece was already marked, return null
     if(isMarked === false) {
       return null;
     }
@@ -283,13 +323,33 @@ const game = {
 
     // check the game result
     if(this.checkWin() !== undefined) {
-      board.markResult(this.checkWin());
-    }
-    this.checkWin();
+      const matchedPiecesArr = this.checkWin();
+      board.markResult(matchedPiecesArr);
+      this.displayWinner(this.currentPlayer);
 
-    this.checkDraw();
+      return null;
+    }
+
+    if(this.checkDraw()) {
+      this.displayWinner();
+
+      return null;
+    }
 
     // swap player
     this.swapPlayer();
   },
 }
+
+$("#playAgainBtn").on("click", function() {
+  board.initialise(3);
+  board.drawDOM(0);
+  game.cleanDOM();
+});
+
+$("#playNewGameBtn").on("click", function() {
+  board.initialise(3);
+  board.drawDOM(0);
+  game.cleanDOM();
+  player.activatePlayerForm();
+});

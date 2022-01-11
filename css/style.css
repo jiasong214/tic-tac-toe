@@ -56,6 +56,7 @@ header .gameTitle {
   grid-template-rows: repeat(3, 1fr);
   border: 2px solid rgba(128, 128, 128, 0.5);
   box-shadow: -10px 10px 1px var(--blue-color);
+  transition: 0.3s;
 }
 
 #board > div {
@@ -87,6 +88,7 @@ header .gameTitle {
   position: fixed;
   left: 0;
   bottom: 0;
+  z-index: 51;
 }
 
 .playersInfo > div {
@@ -97,11 +99,12 @@ header .gameTitle {
 
 .playersInfo img {
   display: block;
-  width: 200px;
-  left: 50%;
-  transform: translateX(-50%);
+  width: 180px;
   position: absolute;
-  bottom: 70%;
+  left: 50%;
+  bottom: 85px;
+  transform: translateX(-50%);
+  transition: width 0.5s;
 }
 .playersInfo h2 {
   margin-bottom: 10px;
@@ -126,7 +129,7 @@ header .gameTitle {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 50;
+  z-index: 52;
   transform: translate(100%, -100%) rotate(180deg);
 
   transition: border-width 1s, transform 1s 1s;
@@ -232,7 +235,7 @@ header .gameTitle {
   transition: 0.3s;
 }
 
-.buttons-wrapper {
+#gameSettingForm .buttons-wrapper {
   position: absolute;
   top: 50%;
   left: 50%;
@@ -240,12 +243,57 @@ header .gameTitle {
   z-index: 100;
 }
 
-.buttons-wrapper > button {
+#gameSettingForm .buttons-wrapper > button {
   all: unset;
   padding: 20px 50px;
   background: black;
   color: white;
   font-size: 16px;
   font-weight: 400;
+  cursor: pointer;
+}
+
+#winner-bg {
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  display: none;
+}
+
+#winner-bg .winner-wrapper {
+  width: fit-content;
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+#winner-bg p {
+  margin-bottom: 30px;
+  font-size: 72px;
+  color: white;
+  font-weight: 900;
+  text-align: center;
+}
+
+#winner-bg .buttons-wrapper {
+  width: fit-content;
+  margin: 0 auto;
+  display: flex;
+  gap: 30px;
+}
+
+#winner-bg button {
+  all: unset;
+  display: block;
+  padding: 30px 50px;
+  font-size: 18px;
+  color: white;
+  background: black;
+  box-shadow: 5px 5px white;
   cursor: pointer;
 }
