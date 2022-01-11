@@ -1,6 +1,9 @@
 const DOM = {
+  // this will run once for every game
   drawGameBoard: function() {
+    // get data from business part
     const gameBoard = board.gameBoard;
+
     // clean the DOM, and set the layout with grid
     $("#board")
       .html("")
@@ -29,6 +32,11 @@ const DOM = {
     })
   },
 
+  markGameBoard: function(column, row, currentPlayer) {
+    const targetElement = $(`div[data-column='${column}'][data-row='${row}']`);
+    targetElement.html(`<span>${currentPlayer.token}</span>`)
+  },
+
   markResultOnGameBoard: function(resultArr) {
     for(let item of resultArr) {
       const targetElement = $(`div[data-column='${item[0]}'][data-row='${item[1]}']`);
@@ -37,6 +45,7 @@ const DOM = {
   },
 
   updatePlayersInfo: function() {
+    // get data from business part
     const playersInfo = player.players;
 
     $("#player1 > h2").html(playersInfo.player1.name);
@@ -80,8 +89,11 @@ const DOM = {
   },
 
   clickBoard: function(column, row) {
+    // get data from business part
+    const currentPlayer = game.currentPlayer;
+
     // mark the "gameBoard" array
-    const isMarked = board.mark(column, row, game.currentPlayer);
+    const isMarked = board.mark(column, row, currentPlayer);
 
     // if the piece was already marked, return null
     if(isMarked === false) {
@@ -89,13 +101,13 @@ const DOM = {
     }
 
     // update the board in the DOM
-    this.drawGameBoard();
+    this.markGameBoard(column, row, currentPlayer);
 
     // check the game result
     if(game.checkWin() !== undefined) {
       const matchedPiecesArr = game.checkWin();
       this.markResultOnGameBoard(matchedPiecesArr);
-      this.displayGameResult(game.currentPlayer);
+      this.displayGameResult(currentPlayer);
 
       return null;
     }
@@ -109,13 +121,49 @@ const DOM = {
 
     // if game is still going, swap the player
     game.swapPlayer();
+
+    DOM.saveInLocalStorage();
   },
+
+  saveInLocalStorage: function() {
+    const gameData = {
+      players: player.players,
+      gameBoard: board.gameBoard
+    }
+
+    // save these in local storage
+    localStorage.setItem("tic-tac-toe", JSON.stringify(gameData));
+  },
+
+  useLocalStorageData: function() {
+    // TODO
+    // if there is data in LS,
+    // 1. remove game setting screen
+    // 2. update "game.gameBoard", "player.players" in business logic
+    // 3. update DOM
+
+    const gameData = JSON.parse(localStorage.getItem('tic-tac-toe'));
+
+    if(gameData === null) {
+      return null;
+    }
+
+    // close the "gameSettingScreen" by removing "active" class
+    $("#gameSettingScreen").attr("class", "");
+
+
+
+    console.log(gameData)
+  }
 }
 
+// DOM.saveInLocalStorage();
+// DOM.useLocalStorageData();
 
-
+// when its loaded
 board.initialise();
 DOM.drawGameBoard();
+
 
 // playAgain button click event handler
 $("#playAgainBtn").on("click", function() {
@@ -165,4 +213,6 @@ $("#playersInfoForm").on("submit", function(event) {
 
   // close the "gameSettingScreen" by removing "active" class
   $("#gameSettingScreen").attr("class", "");
+
+  DOM.saveInLocalStorage();
 });

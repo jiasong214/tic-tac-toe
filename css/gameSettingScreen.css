@@ -10,7 +10,7 @@
   transform: translate(100%, -100%) rotate(180deg);
   transition: border-width 1s, transform 1s 1s;
 
-  display: none;
+  /* display: none; */
 }
 
 /* with the "active" class, it will on the screen */
