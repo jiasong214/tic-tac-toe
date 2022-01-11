@@ -10,39 +10,74 @@
   <title>Document</title>
 </head>
 <body>
-  <h1 class="gameTitle">Tic Tac Toe</h1>
-  <div id="board">
-  </div>
-
-  <div id="player1Info">
-    <h2>Player1</h2>
-    <p>O</p>
-  </div>
-
-  <div id="player2Info">
-    <h2>Player2</h2>
-    <p>X</p>
-  </div>
-
-  <form id="playerForm">
-    <div>
-      <input type="text" id="player1Name" placeholder="Enter Player1 name">
-      <select name="" id="player1Mark">
-        <option value="O">O</option>
-        <option value="❤️">❤️</option>
-        <option value="🥰">🥰</option>
-      </select>
+  <header>
+    <h1 class="gameTitle">Tic Tac Toe</h1>
+    <button>Stop</button>
+  </header>
+  <main>
+    <div id="board">
     </div>
-    <div>
-      <input type="text" id="player2Name" placeholder="Enter Player2 name">
-      <select name="" id="player2Mark">
-        <option value="X">X</option>
-        <option value="🥶">🥶</option>
-        <option value="🤢">🤢</option>
-      </select>
+
+    <div class="playersInfo">
+      <div id="player1Info">
+        <img src="images/person1.png" alt="">
+        <h2>Player1</h2>
+        <p>O</p>
+      </div>
+    
+      <div id="player2Info">
+        <img src="images/person2.png" alt="">
+        <h2>Player2</h2>
+        <p>X</p>
+      </div>
     </div>
-    <button type="submit">Play</button>
-  </form>
-  
+
+    <div id="form-bg" class="active">
+      <h2>TIC<br/>TAC<br/>TOE</h2>
+      <img src="https://assets.website-files.com/5e51b3b0337309d672efd94c/5e53699f33d3683a073e83a2_slider-2.svg" alt="">
+      <!-- <div class="buttons-wrapper">
+        <button id="">Play with a Friend</button>
+        <button id="">Play with AI</button>
+      </div> -->
+
+      <div class="gameSettingForm-wrapper">
+        <form id="gameSettingForm">
+          <div>
+            <h2>Player 1</h2>
+            <input type="text" id="player1Name" placeholder="Player1 name">
+            <select name="" id="player1Mark">
+              <option value="O">O</option>
+              <option value="❤️">❤️</option>
+              <option value="🥰">🥰</option>
+            </select>
+          </div>
+          <div>
+            <h2>Player 2</h2>
+            <input type="text" id="player2Name" placeholder="Player2 name">
+            <select name="" id="player2Mark">
+              <option value="X">X</option>
+              <option value="🥶">🥶</option>
+              <option value="🤢">🤢</option>
+            </select>
+          </div>
+          <div>
+            <h2>GRID</h2>
+            <select name="" id="">
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+            </select>
+          </div>
+          <button type="submit">Play</button>
+        </form>
+      </div>
+
+    </div>
+
+  </main>
 </body>
 </html>

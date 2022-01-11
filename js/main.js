@@ -83,7 +83,7 @@ const player = {
   }
 }
 // form submit event
-$("#playerForm").on("submit", function(event) {
+$("#gameSettingForm").on("submit", function(event) {
   event.preventDefault();
 
   const player1Name = $("#player1Name").val();
@@ -95,6 +95,8 @@ $("#playerForm").on("submit", function(event) {
   player.changePlayersName(player1Name, player2Name);
   player.changePlayersMark(player1Mark, player2Mark);
   player.updateDOM();
+
+  $("#form-bg").attr("class", "");
 });
 
 

@@ -1,26 +1,68 @@
-body {
-  box-sizing: border-box;
+div,
+p,
+h1,
+h2,
+h3,
+span {
   margin: 0;
   padding: 0;
 }
 
-.gameTitle {
-  text-align: center;
+:root {
+  /* --blue-color: rgb(2, 2, 175); */
+  --blue-color: #00539c;
+  --yellow-color: #ffd662;
+  --red-color: rgb(214, 51, 51);
+}
+
+body * {
+  box-sizing: border-box !important;
+}
+
+@import url("https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap");
+
+body {
+  width: 100vw;
+  height: 100vh;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: "Lato", sans-serif;
+  position: relative;
+  border: 20px solid var(--blue-color);
+  /* box-shadow: inset 3px 3px 1px var(--yellow-color); */
+}
+
+header {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 50px;
+}
+
+header .gameTitle {
+  font-size: 16px;
+  font-weight: 600;
 }
 
 #board {
   width: 400px;
   height: 400px;
-  margin: 0 auto;
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   grid-template-rows: repeat(3, 1fr);
+  border: 2px solid rgba(128, 128, 128, 0.5);
+  box-shadow: -10px 10px 1px var(--blue-color);
 }
 
 #board > div {
   width: 100%;
   height: 100%;
-  border: 1px solid black;
+  border: 2px solid rgba(128, 128, 128, 0.5);
+
   position: relative;
 }
 
@@ -34,18 +76,175 @@ body {
   pointer-events: none;
 }
 
-#player1Info,
-#player2Info {
+.playersInfo {
+  width: 100vw;
+  padding: 10px 50px;
+  background: var(--yellow-color);
+  border: 20px solid var(--blue-color);
+  border-top: 10px solid var(--red-color);
+  display: flex;
+  justify-content: space-between;
+  position: fixed;
+  left: 0;
+  bottom: 0;
+}
+
+.playersInfo > div {
   width: 200px;
-  border: 1px solid blue;
+  padding: 5px 0;
+  position: relative;
+}
+
+.playersInfo img {
+  display: block;
+  width: 200px;
+  left: 50%;
+  transform: translateX(-50%);
   position: absolute;
-  top: 30%;
+  bottom: 70%;
+}
+.playersInfo h2 {
+  margin-bottom: 10px;
+  font-size: 14px;
+  font-weight: 400;
+  text-align: center;
 }
 
-#player2Info {
-  right: 0;
+.playersInfo p {
+  width: 30px;
+  height: 30px;
+  font-size: 28px;
+  text-align: center;
+  margin: 0 auto;
 }
 
-#playerForm {
-  border: 1px solid red;
+#form-bg {
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 50;
+  background: var(--yellow-color);
+
+  border: 100px solid var(--blue-color);
+  transform: translate(100%, -100%) rotate(180deg);
+
+  transition: border-width 1s, transform 1s 1s;
+}
+#form-bg.active {
+  transform: translate(0, 0) rotate(0deg);
+  border: 20px solid var(--blue-color);
+}
+
+#form-bg.active #gameSettingForm {
+  opacity: 1;
+}
+
+#form-bg > h2 {
+  font-size: 200px;
+  color: var(--blue-color);
+  line-height: 0.9;
+  text-shadow: 7px 7px var(--red-color);
+}
+
+#form-bg > img {
+  width: 40vw;
+  position: absolute;
+  bottom: -10%;
+  right: -3%;
+  transform: scaleX(-1);
+}
+
+#gameSettingForm {
+  width: 500px;
+  padding: 50px 100px;
+  background: white;
+  border: 3px solid black;
+  box-shadow: 10px 10px var(--blue-color);
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: 0.3s;
+}
+
+#gameSettingForm > * {
+  margin-bottom: 50px;
+}
+
+#gameSettingForm h2 {
+  font-size: 14px;
+  color: gray;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  line-height: 1;
+  border-bottom: 3px dashed gray;
+  margin-bottom: 20px;
+}
+
+#gameSettingForm input {
+  all: unset;
+  display: block;
+  margin: 0 auto;
+  width: 300px;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid gray;
+  border-radius: 10px;
+}
+
+#gameSettingForm select {
+  /* all: unset; */
+  display: block;
+  margin: 0 auto;
+  width: 300px;
+  padding: 10px;
+  border: 1px solid gray;
+  border-radius: 10px;
+}
+
+#gameSettingForm button {
+  all: unset;
+  display: block;
+  width: 100%;
+  padding: 12px;
+  background: black;
+  /* background: var(--blue-color); */
+  color: white;
+  font-size: 16px;
+  text-align: center;
+  cursor: pointer;
+  box-shadow: 5px 5px var(--yellow-color);
+
+  position: relative;
+  top: 0px;
+  left: 0px;
+  transition: 0.3s;
+}
+#gameSettingForm button:hover {
+  box-shadow: none;
+  top: 2px;
+  left: 2px;
+  transition: 0.3s;
+}
+
+.buttons-wrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 100;
+}
+
+.buttons-wrapper > button {
+  all: unset;
+  padding: 20px 50px;
+  background: black;
+  color: white;
+  font-size: 16px;
+  font-weight: 400;
+  cursor: pointer;
 }
