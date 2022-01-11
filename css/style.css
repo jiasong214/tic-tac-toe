@@ -121,16 +121,17 @@ header .gameTitle {
 #form-bg {
   width: 100vw;
   height: 100vh;
+  background: var(--yellow-color);
+  border: 100px solid var(--blue-color);
   position: fixed;
   top: 0;
   left: 0;
   z-index: 50;
-  background: var(--yellow-color);
-
-  border: 100px solid var(--blue-color);
   transform: translate(100%, -100%) rotate(180deg);
 
   transition: border-width 1s, transform 1s 1s;
+
+  display: none;
 }
 #form-bg.active {
   transform: translate(0, 0) rotate(0deg);

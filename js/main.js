@@ -11,14 +11,14 @@ const board = {
     }
   },
 
-  // update the array for tracking
-  updateGameBoard: function(column, row, mark) {
+  // mark the array 
+  mark: function(column, row, player) {
     // if target position is already filled with mark, return false
     if(this.gameBoard[column][row] !== "") {
       return false;
     }
 
-    this.gameBoard[column][row] = mark;
+    this.gameBoard[column][row] = player.mark;
   },
 
   // represent the board in DOM
@@ -47,6 +47,12 @@ const board = {
       game.clickBoard(event.target.className);
     });
   },
+
+  markResult: function(resultArr) {
+    for(let item of resultArr) {
+      $(`.${item[0]}-${item[1]}`).css("background", "purple");
+    }
+  }
 }
 
 board.initialise(3);
@@ -86,8 +92,8 @@ const player = {
 $("#gameSettingForm").on("submit", function(event) {
   event.preventDefault();
 
-  const player1Name = $("#player1Name").val();
-  const player2Name = $("#player2Name").val();
+  const player1Name = $("#player1Name").val() || "Player1";
+  const player2Name = $("#player2Name").val() || "Player2";
 
   const player1Mark = $("#player1Mark").val();
   const player2Mark = $("#player2Mark").val();
@@ -98,7 +104,6 @@ $("#gameSettingForm").on("submit", function(event) {
 
   $("#form-bg").attr("class", "");
 });
-
 
 
 // 3. play game
@@ -113,6 +118,7 @@ const game = {
     }
   },
 
+
   checkWin: function() {
     const currentBoard = board.gameBoard;
 
@@ -121,96 +127,141 @@ const game = {
 
     // 1. check rows
     for(let i=0; i<currentBoard.length; i++) {
-      for(let j=0; j<currentBoard.length; j++) {
-        if(ref === "") {
-          continue;
-        }
-  
-        if(ref === currentBoard[i][j]) {
-          counter++;
+      let answerTracker = [];
 
-          if(counter === 3) {
-            console.log(`there is winner in column ${i}, row ${j}`);
-            console.log(`[${i}, ${j-2}], [${i}, ${j-1}], [${i}, ${j}]`);
-          }
-        }else {
+
+      for(let j=0; j<currentBoard.length; j++) {
+        // console.log(`%c------------------- ${i}th loop start -------------------------`, `background: orange`)
+        // if ref is "" or is not matched with the current piece, initialise counter and move ref to next piece.
+        if(ref === "" || ref !== currentBoard[i][j]) {
+          // initialise counter and answerTracker for next column check
           counter = 0;
+          answerTracker = [];
+
+          // move to next column
           ref = currentBoard[i][j];
         }
   
-        // console.log(currentBoard)
-        // console.log(counter);
+        // if ref is not "" and is matched with the current piece, add counter
+        if(ref !== "" && ref === currentBoard[i][j]) {
+          counter++;
+
+          answerTracker.push([i, j]);
+          console.log(`you clicked a piece on column ${i}, row ${j}, counter: ${counter}`);
+
+          // if counter is 3 (3 pieces are matched in a row), return winner
+          if(counter === 3) {
+            console.log(answerTracker);
+
+            return answerTracker;
+          }
+        }
       }
+      // initialise counter before check next column
+      counter = 0;
     }
 
+    // initialise ref
     ref = currentBoard[0][0];
 
     // 2. check columns
     for(let i=0; i<currentBoard.length; i++) {
-      for(let j=0; j<currentBoard.length; j++) {
-        if(ref === "") {
-          continue;
-        }
-  
-        if(ref === currentBoard[j][i]) {
-          counter++;
+      let answerTracker = [];
 
-          if(counter === 3) {
-            console.log(`there is winner in column ${j}, row ${i}`);
-            console.log(`[${i}, ${j-2}], [${i}, ${j-1}], [${i}, ${j}]`);
-          }
-        }else {
+
+      for(let j=0; j<currentBoard.length; j++) {
+        //  not matched
+        if(ref === "" || ref !== currentBoard[j][i]) {
           counter = 0;
+          answerTracker = [];
           ref = currentBoard[j][i];
         }
   
-        console.log(currentBoard)
-        console.log(counter);
+        // matched
+        if(ref === currentBoard[j][i]) {
+          counter++;
+          answerTracker.push([j, i]);
+
+          if(counter === 3) {
+            console.log("columns")
+            console.log(answerTracker)
+
+            return answerTracker;
+          }
+        }
+
       }
+      counter=0;
     }
 
     ref = currentBoard[0][0];
 
+    let answerTracker = [];
 
-    // 3. check diagonal (1)
+    // 3. check diagonal top right
     for(let i=0; i<currentBoard.length; i++) {
-      if(ref === "") {
-        continue;
+      if(ref === "" || ref !== currentBoard[i][i]) {
+        counter = 0;
+        answerTracker = [];
+        ref = currentBoard[i][i];
       }
   
       if(ref === currentBoard[i][i]) {
         counter++;
+        answerTracker.push([i, i]);
 
         if(counter === 3) {
-          console.log(`there is winner in column ${i}, row ${i}`)
+          console.log("diagonal top right")
+          console.log(answerTracker);
+
+          return answerTracker;
         }
-      }else {
-        counter = 0;
-        ref = currentBoard[i][i];
       }
     }
 
     ref = currentBoard[0][0];
+    counter = 0;
+    answerTracker = [];
 
-
-    // 4. check diagonal (2)
+    // 4. check diagonal top left
     for(let i=0; i<currentBoard.length; i++) {
-      if(ref === "") {
-        continue;
+      if(ref === "" || ref !== currentBoard[i][currentBoard.length-i-1]) {
+        counter = 0;
+        answerTracker = [];
+        ref = currentBoard[i][currentBoard.length-i-1];
       }
-
-      console.log(currentBoard.length-i, i)
   
-      if(ref === currentBoard[currentBoard.length-i-1][i]) {
+      if(ref === currentBoard[i][currentBoard.length-i-1]) {
         counter++;
+        answerTracker.push([i, currentBoard.length-i-1]);
+
 
         if(counter === 3) {
+          console.log("diagonal top left");
+          console.log(answerTracker);
 
-          console.log(`there is winner in column ${currentBoard.length-i-1}, row ${i}`)
+          return answerTracker;
         }
-      }else {
-        counter = 0;
-        ref = currentBoard[currentBoard.length-i-1][i];
+      }
+    }
+  },
+
+  checkDraw: function() {
+    const currentBoard = board.gameBoard;
+
+    const totalPieces = currentBoard.length * currentBoard.length;
+    let counter = 0;
+  
+
+    for(let i=0; i<currentBoard.length; i++) {
+      for(let j=0; j<currentBoard.length; j++) {
+        if(currentBoard[i][j] !== "") {
+          counter++;
+        }
+
+        if(counter >= totalPieces - 1) {
+          console.log("draw")
+        }
       }
     }
   },
@@ -220,8 +271,7 @@ const game = {
     const rowID = parseInt(boardID[2]);
 
     // mark the board.gameBoard 
-    const isMarked = board.updateGameBoard(columnID, rowID, this.currentPlayer.mark);
-
+    const isMarked = board.mark(columnID, rowID, this.currentPlayer);
 
     // if the ? was already marked, return null
     if(isMarked === false) {
@@ -231,8 +281,13 @@ const game = {
     // update board DOM
     board.drawDOM();
 
-    // check if game is over
+    // check the game result
+    if(this.checkWin() !== undefined) {
+      board.markResult(this.checkWin());
+    }
     this.checkWin();
+
+    this.checkDraw();
 
     // swap player
     this.swapPlayer();
