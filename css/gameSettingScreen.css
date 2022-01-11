@@ -9,6 +9,8 @@
   z-index: 52;
   transform: translate(100%, -100%) rotate(180deg);
   transition: border-width 1s, transform 1s 1s;
+
+  display: none;
 }
 
 /* with the "active" class, it will on the screen */
@@ -17,7 +19,7 @@
   border: 20px solid var(--blue-color);
 }
 
-#gameSettingScreen.active #playerInfoForm {
+#gameSettingScreen.active #playersInfoForm {
   opacity: 1;
 }
 
@@ -36,7 +38,7 @@
   transform: scaleX(-1);
 }
 
-#playerInfoForm {
+#playersInfoForm {
   width: 500px;
   padding: 50px 100px;
   background: white;
@@ -50,11 +52,11 @@
   transition: 0.3s;
 }
 
-#playerInfoForm > * {
+#playersInfoForm > * {
   margin-bottom: 50px;
 }
 
-#playerInfoForm h2 {
+#playersInfoForm h2 {
   margin-bottom: 20px;
   border-bottom: 3px dashed gray;
   font-size: 14px;
@@ -65,7 +67,7 @@
   line-height: 1;
 }
 
-#playerInfoForm input {
+#playersInfoForm input {
   all: unset;
   display: block;
   width: 300px;
@@ -75,7 +77,7 @@
   border-radius: 10px;
 }
 
-#playerInfoForm select {
+#playersInfoForm select {
   display: block;
   width: 300px;
   margin: 0 auto;
@@ -83,7 +85,7 @@
   border-radius: 10px;
 }
 
-#playerInfoForm button {
+#playersInfoForm button {
   all: unset;
   display: block;
   width: 100%;
@@ -99,7 +101,7 @@
   left: 0px;
   transition: 0.3s;
 }
-#playerInfoForm button:hover {
+#playersInfoForm button:hover {
   box-shadow: none;
   top: 2px;
   left: 2px;

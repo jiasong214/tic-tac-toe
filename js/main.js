@@ -1,12 +1,13 @@
 // 1. set the game board
 const board = {
   gameBoard: [],
-
   boardSize: 3,
 
-  // create a game board depends on arguments value
+  // create a game board and fill it with an empty string
   initialise: function(size) {
+    // initialise gameBoard array
     this.gameBoard = [];
+    // set the board size. if argument is not exist, it'll use former of "boardSize"
     this.boardSize = size || this.boardSize;
 
     for(let i=0; i<this.boardSize; i++) {
@@ -16,50 +17,54 @@ const board = {
     }
   },
 
-  // mark the array 
+  // mark the token on the "gameBoard" array 
   mark: function(column, row, player) {
-    // if target position is already filled with mark, return false
+    // if target position is already filled with token, return false
     if(this.gameBoard[column][row] !== "") {
       return false;
     }
 
-    this.gameBoard[column][row] = player.mark;
+    this.gameBoard[column][row] = player.token;
   },
 
-  // represent the board in DOM
-  drawDOM: function() {
-    // clean the DOM, layout grid
-    $("#board")
-      .html("")
-      .css({
-      "grid-template-columns": `repeat(${this.gameBoard.length}, 1fr)`,
-      "grid-template-rows": `repeat(${this.gameBoard.length}, 1fr)`
-    });
+  // // represent the "gameBoard" array in the DOM
+  // drawDOM: function() {
+  //   // clean the DOM, and set the layout with grid
+  //   $("#board")
+  //     .html("")
+  //     .css({
+  //     "grid-template-columns": `repeat(${this.gameBoard.length}, 1fr)`,
+  //     "grid-template-rows": `repeat(${this.gameBoard.length}, 1fr)`
+  //   });
 
-    // append items in board
-    for(let i=0; i<this.gameBoard.length; i++) {
-      for(let j=0; j<this.gameBoard.length; j++) {
-        $("#board").append(`
-          <div class="${i}-${j}">
-            <span>${this.gameBoard[i][j]}</span>
-          </div>
-        `);
-      }
-    }
+  //   // append items in board
+  //   for(let i=0; i<this.gameBoard.length; i++) {
+  //     for(let j=0; j<this.gameBoard.length; j++) {
+  //       $("#board").append(`
+  //         <div data-column="${i}" data-row="${j}">
+  //           <span>${this.gameBoard[i][j]}</span>
+  //         </div>
+  //       `);
+  //     }
+  //   }
 
-    // connect to event handler
-    $("#board > div").on("click", function(event) {
-      game.clickBoard(event.target.className);
-    });
-  },
+  //   // connect to event handler
+  //   $("#board > div").on("click", function() {
+  //     const column = $(this).attr("data-column");
+  //     const row = $(this).attr("data-row");
 
-  markResult: function(resultArr) {
-    for(let item of resultArr) {
-      $(`.${item[0]}-${item[1]}`).css("background", "rgb(214, 51, 51)");
-    }
-  }
+  //     game.clickBoard(column, row);
+  //   });
+  // },
+
+  // // show the winner's result in the DOM 
+  // markResultOnDOM: function(resultArr) {
+  //   for(let item of resultArr) {
+  //     const targetElement = $(`div[data-column='${item[0]}'][data-row='${item[1]}']`);
+  //     targetElement.css("background", "rgb(214, 51, 51)");
+  //   }
+  // }
 }
-
 
 
 // 2. set players
@@ -68,62 +73,38 @@ const player = {
     player1: {
       id: 1,
       name: "PLAYER1",
-      mark: "o"
+      token: "o"
     },
     player2: {
       id: 2,
       name: "PLAYER2",
-      mark: "x"
+      token: "x"
     }
   },
 
+  // update "players" object with user input
   changePlayersName: function(player1Name, player2Name) {
     this.players.player1.name = player1Name;
     this.players.player2.name = player2Name;
   },
 
-  changePlayersMark: function(player1Mark, player2Mark) {
-    this.players.player1.mark = player1Mark;
-    this.players.player2.mark = player2Mark;
+  changePlayersToken: function(player1Token, player2Token) {
+    this.players.player1.token = player1Token;
+    this.players.player2.token = player2Token;
   },
 
-  activatePlayerForm: function() {
-    $("#gameSettingScreen").attr("class", "active");
-  },
-
-  updateDOM: function() {
-    $("#player1 > h2").html(this.players.player1.name);
-    $("#player1 > p").html(this.players.player1.mark);
-    $("#player2 > h2").html(this.players.player2.name);
-    $("#player2 > p").html(this.players.player2.mark);
-  }
-
+  // updateDOM: function() {
+  //   $("#player1 > h2").html(this.players.player1.name);
+  //   $("#player1 > p").html(this.players.player1.token);
+  //   $("#player2 > h2").html(this.players.player2.name);
+  //   $("#player2 > p").html(this.players.player2.token);
+  // }
 }
-// form submit event
-$("#playerInfoForm").on("submit", function(event) {
-  event.preventDefault();
-
-  const player1Name = $("#player1Name").val() || "Player1";
-  const player2Name = $("#player2Name").val() || "Player2";
-
-  const player1Mark = $("#player1Mark").val();
-  const player2Mark = $("#player2Mark").val();
-
-  player.changePlayersName(player1Name, player2Name);
-  player.changePlayersMark(player1Mark, player2Mark);
-  player.updateDOM();
-
-  $("#gameSettingScreen").attr("class", "");
-
-  const boardSize = parseInt($("#boardSize").val());
-
-  board.initialise(boardSize);
-  board.drawDOM();
-});
 
 
 // 3. play game
 const game = {
+  // set a default current player
   currentPlayer: player.players.player1,
 
   swapPlayer: function() {
@@ -144,30 +125,27 @@ const game = {
     for(let i=0; i<currentBoard.length; i++) {
       let answerTracker = [];
 
-
       for(let j=0; j<currentBoard.length; j++) {
-        // console.log(`%c------------------- ${i}th loop start -------------------------`, `background: orange`)
-        // if ref is "" or is not matched with the current piece, initialise counter and move ref to next piece.
+        // if ref is "" or is not matched with the current piece, 
+        // initialise the counter and move the ref to the next piece.
         if(ref === "" || ref !== currentBoard[i][j]) {
-          // initialise counter and answerTracker for next column check
+          // initialise the counter and answerTracker for the next column check
           counter = 0;
           answerTracker = [];
 
-          // move to next column
+          // move to the next column
           ref = currentBoard[i][j];
         }
   
-        // if ref is not "" and is matched with the current piece, add counter
+        // if ref is not "" and is matched with the current piece,
         if(ref !== "" && ref === currentBoard[i][j]) {
+          // add counter
           counter++;
-
+          // push the current combination to the "answerTracker"
           answerTracker.push([i, j]);
-          console.log(`you clicked a piece on column ${i}, row ${j}, counter: ${counter}`);
 
-          // if counter is 3 (3 pieces are matched in a row), return winner
+          // if the counter is 3 (3 pieces are matched in a row), return answerTracker
           if(counter === 3) {
-            console.log(answerTracker);
-
             return answerTracker;
           }
         }
@@ -185,26 +163,20 @@ const game = {
 
 
       for(let j=0; j<currentBoard.length; j++) {
-        //  not matched
         if(ref === "" || ref !== currentBoard[j][i]) {
           counter = 0;
           answerTracker = [];
           ref = currentBoard[j][i];
         }
   
-        // matched
         if(ref === currentBoard[j][i]) {
           counter++;
           answerTracker.push([j, i]);
 
           if(counter === 3) {
-            console.log("columns")
-            console.log(answerTracker)
-
             return answerTracker;
           }
         }
-
       }
       counter=0;
     }
@@ -226,9 +198,6 @@ const game = {
         answerTracker.push([i, i]);
 
         if(counter === 3) {
-          console.log("diagonal top right")
-          console.log(answerTracker);
-
           return answerTracker;
         }
       }
@@ -250,11 +219,7 @@ const game = {
         counter++;
         answerTracker.push([i, currentBoard.length-i-1]);
 
-
         if(counter === 3) {
-          console.log("diagonal top left");
-          console.log(answerTracker);
-
           return answerTracker;
         }
       }
@@ -263,11 +228,12 @@ const game = {
 
   checkDraw: function() {
     const currentBoard = board.gameBoard;
-
     const totalPieces = currentBoard.length * currentBoard.length;
-    let counter = 0;
-  
 
+    let counter = 0;
+
+    // iterate all the pieces in the "gameboard" array
+    // and if players already clicked all the pieces, return true;
     for(let i=0; i<currentBoard.length; i++) {
       for(let j=0; j<currentBoard.length; j++) {
         if(currentBoard[i][j] !== "") {
@@ -281,82 +247,117 @@ const game = {
     }
   },
 
-  displayResult: function(winner) {
-    // block click event
-    $("#board").css("pointer-events", "none");
+  // displayResultDOM: function(winner) {
+  //   // block the click event
+  //   $("#board").css("pointer-events", "none");
 
-    // delay for animation
-    setTimeout(() => {
-      $("#resultScreen").css("display", "block");
+  //   // delay this for smoother animation
+  //   setTimeout(() => {
+  //     $("#resultScreen").css("display", "block");
 
-      if(winner === undefined) {
-        $("#winner-bg p").html(`Draw!`);
-      }else {
-        $(".resultScreen__text").html(`${winner.name} wins!`);
-        $(".playersBar__player img").css("filter", "brightness(0.2)");
-        $(`#player${winner.id} img`).css({
-          "width": "360px",
-          "filter": "none",
-        });
-      }
-      $("#board").css("pointer-events", "auto");
-    }, 500);
+  //     if(winner === undefined) {
+  //       // if
+  //       $("#winner-bg p").html(`Draw!`);
+  //     }else {
+  //       // if one player win, 
+  //       $(".resultScreen__text").html(`${winner.name} wins!`);
+  //       $(".playersBar__player img").css("filter", "brightness(0.2)");
+  //       $(`#player${winner.id} img`).css({
+  //         "width": "360px",
+  //         "filter": "none",
+  //       });
+  //     }
+
+  //     // enable the click event for next game
+  //     $("#board").css("pointer-events", "auto");
+  //   }, 500);
 
 
-  },
+  // },
 
-  cleanResultDOM: function() {
-    $("#resultScreen").css("display", "none");
-    $(".playersBar__player img").css({
-      "filter": "none",
-      "width": "180px",
-    });
-  },
+  // cleanResultDOM: function() {
+  //   $("#resultScreen").css("display", "none");
+  //   $(".playersBar__player img").css({
+  //     "filter": "none",
+  //     "width": "180px",
+  //   });
+  // },
 
-  clickBoard: function(boardID) {
-    const columnID = parseInt(boardID[0]);
-    const rowID = parseInt(boardID[2]);
+//   clickBoard: function(column, row) {
+//     // mark the "gameBoard" array
+//     const isMarked = board.mark(column, row, this.currentPlayer);
 
-    // mark the board.gameBoard 
-    const isMarked = board.mark(columnID, rowID, this.currentPlayer);
+//     // if the piece was already marked, return null
+//     if(isMarked === false) {
+//       return null;
+//     }
 
-    // if the piece was already marked, return null
-    if(isMarked === false) {
-      return null;
-    }
+//     // update the board in the DOM
+//     board.drawDOM();
 
-    // update board DOM
-    board.drawDOM();
+//     // check the game result
+//     if(this.checkWin() !== undefined) {
+//       const matchedPiecesArr = this.checkWin();
+//       board.markResultOnDOM(matchedPiecesArr);
+//       this.displayResultDOM(this.currentPlayer);
 
-    // check the game result
-    if(this.checkWin() !== undefined) {
-      const matchedPiecesArr = this.checkWin();
-      board.markResult(matchedPiecesArr);
-      this.displayResult(this.currentPlayer);
+//       return null;
+//     }
 
-      return null;
-    }
+//     // if nobody win yet, check if the game is drawn
+//     if(this.checkDraw()) {
+//       this.displayResultDOM();
 
-    if(this.checkDraw()) {
-      this.displayResult();
+//       return null;
+//     }
 
-      return null;
-    }
-
-    // swap player
-    this.swapPlayer();
-  },
+//     // if game is still going, swap the player
+//     this.swapPlayer();
+//   },
 }
 
-$("#playAgainBtn").on("click", function() {
-  board.initialise();
-  board.drawDOM();
-  game.cleanResultDOM();
-});
+// board.initialise();
+// board.drawDOM();
 
-$("#playNewGameBtn").on("click", function() {
-  // board.initialise();
-  // board.drawDOM();
-  game.cleanResultDOM();
-  player.activatePlayerForm();
-});
+// // playAgain button click event
+// $("#playAgainBtn").on("click", function() {
+//   board.initialise();
+//   board.drawDOM();
+//   game.cleanResultDOM();
+// });
+
+// // newGame button click event
+// $("#playNewGameBtn").on("click", function() {
+//   game.cleanResultDOM();
+//   $("#gameSettingScreen").attr("class", "active");
+// });
+
+// // form submit event
+// $("#playersInfoForm").on("submit", function(event) {
+//   // prevent refresh
+//   event.preventDefault();
+
+//   // get players names from the input. if a user didn't type anything, set it default value as "Player1"
+//   const player1Name = $("#player1Name").val() || "Player1";
+//   const player2Name = $("#player2Name").val() || "Player2";
+
+//   // get players tokens
+//   const player1Token = $("#player1Token").val();
+//   const player2Token = $("#player2Token").val();
+
+//   // put the value in the "players" object, and update DOM with them
+//   player.changePlayersName(player1Name, player2Name);
+//   player.changePlayersToken(player1Token, player2Token);
+//   player.updateDOM();
+
+//   // get a board size
+//   const boardSize = parseInt($("#boardSize").val());
+
+//   // close the "gameSettingScreen" by removing "active" class
+//   $("#gameSettingScreen").attr("class", "");
+
+//   // initialise the game board with user's size input
+//   board.initialise(boardSize);
+//   // and draw the game board in the DOM
+//   board.drawDOM();
+// });
