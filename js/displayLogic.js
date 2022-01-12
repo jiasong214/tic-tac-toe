@@ -8,38 +8,38 @@ const DOM = {
     $("#board")
       .html("")
       .css({
-      "grid-template-columns": `repeat(${gameBoard.length}, 1fr)`,
-      "grid-template-rows": `repeat(${gameBoard.length}, 1fr)`
+      "grid-template-rows": `repeat(${gameBoard.length}, 1fr)`,
+      "grid-template-columns": `repeat(${gameBoard.length}, 1fr)`
     });
 
-    // append items in board
+    // append the items in the board
     for(let i=0; i<gameBoard.length; i++) {
       for(let j=0; j<gameBoard.length; j++) {
         $("#board").append(`
-          <div data-column="${i}" data-row="${j}">
+          <div data-row="${i}" data-column="${j}">
             <span>${gameBoard[i][j]}</span>
           </div>
         `);
       }
     }
 
-    // connect to event handler
+    // connect to the event handler
     $("#board > div").on("click", function() {
-      const column = $(this).attr("data-column");
       const row = $(this).attr("data-row");
+      const column = $(this).attr("data-column");
 
-      DOM.clickBoard(column, row);
+      DOM.clickBoard(row, column);
     })
   },
 
-  markGameBoard: function(column, row, currentPlayer) {
-    const targetElement = $(`div[data-column='${column}'][data-row='${row}']`);
+  markGameBoard: function(row, column, currentPlayer) {
+    const targetElement = $(`div[data-row='${row}'][data-column='${column}']`);
     targetElement.html(`<span>${currentPlayer.token}</span>`)
   },
 
   markResultOnGameBoard: function(resultArr) {
     for(let item of resultArr) {
-      const targetElement = $(`div[data-column='${item[0]}'][data-row='${item[1]}']`);
+      const targetElement = $(`div[data-row='${item[0]}'][data-column='${item[1]}']`);
       targetElement.css("background", "rgb(214, 51, 51)");
     }
   },
@@ -101,29 +101,21 @@ const DOM = {
     });
   },
 
-  clickBoard: function(column, row) {
+  clickBoard: function(row, column) {
     // get data from business part
     const currentPlayer = game.currentPlayer;
 
-    // 0. if a user is playing with AI
-    console.log(game.singlePlayer, game.currentPlayer.name)
-    if(game.singlePlayer && game.currentPlayer.name === "Robot") {
-      // AI should click a cell here
-      const position = game.AIPlay();
-
-      this.clickBoard(position[0], position[1]);
-    }
-
     // 1. mark the "gameBoard" array
-    const isMarked = board.mark(column, row, currentPlayer);
+    const isMarked = board.mark(row, column, currentPlayer);
 
     // if the cell was already marked, return null
     if(isMarked === false) {
+      console.log("robot choose wrong one")
       return null;
     }
 
     // 2. update the board in the DOM
-    this.markGameBoard(column, row, currentPlayer);
+    this.markGameBoard(row, column, currentPlayer);
 
     // 3. check the game result
     if(game.checkWin() !== undefined) {
@@ -141,12 +133,29 @@ const DOM = {
       return null;
     }
 
+
     // 5. if game is still going, swap the player
     game.swapPlayer();
     // and active the effect of the other player to play
     this.activeCurrentPlayer();
     // and save the current variables in the local storage
     DOM.saveInLocalStorage();
+
+
+    // 6. if a user is playing with AI, and next turn is "Robot"
+    if(game.currentPlayer.name === "Robot") {
+      this.playWithAI()
+    }
+  },
+
+  playWithAI: function() {
+    // delay for smoother animation
+    setTimeout(function() {
+      // get the position from logic part
+      const position = AI.chooseCell();
+      // and click the board
+      DOM.clickBoard(position[0], position[1]);
+    }, 1000)
   },
 
   bringTheGameSettingScreen: function(delay) {
@@ -239,7 +248,12 @@ $(document).ready(function() {
   DOM.updatePlayersInfo();
   // indicate the current player in the DOM
   DOM.activeCurrentPlayer();
-})
+
+  // if next turn was "Robot", 
+  if(game.currentPlayer.name === "Robot") {
+    DOM.playWithAI();
+  }
+});
 
 // playAgain button click event handler
 $("#playAgainBtn").on("click", function() {
