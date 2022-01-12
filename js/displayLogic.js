@@ -78,6 +78,11 @@ const DOM = {
       // enable the click event for next game
       $("#board").css("pointer-events", "auto");
     }, 500);
+
+    // 
+    board.initialise();
+    game.gameCounter = 0;
+    DOM.saveInLocalStorage();
   },
 
   cleanTheGameResult: function() {
@@ -91,6 +96,7 @@ const DOM = {
   clickBoard: function(column, row) {
     // get data from business part
     const currentPlayer = game.currentPlayer;
+    console.log("current player: "+currentPlayer.name)
 
     // mark the "gameBoard" array
     const isMarked = board.mark(column, row, currentPlayer);
@@ -128,22 +134,26 @@ const DOM = {
   saveInLocalStorage: function() {
     const gameData = {
       players: player.players,
-      gameBoard: board.gameBoard
-    }
+      board: {
+        gameBoard: board.gameBoard,
+        size: board.boardSize,
+      },
+      game: {
+        currentPlayer: game.currentPlayer,
+        gameCounter: game.gameCounter
+      }
+    } 
+    console.log("next player: " + JSON.stringify(gameData.game.currentPlayer))
 
     // save these in local storage
     localStorage.setItem("tic-tac-toe", JSON.stringify(gameData));
   },
 
-  useLocalStorageData: function() {
-    // TODO
-    // if there is data in LS,
-    // 1. remove game setting screen
-    // 2. update "game.gameBoard", "player.players" in business logic
-    // 3. update DOM
-
+  getLocalStorageData: function() {
+    // get local storage data
     const gameData = JSON.parse(localStorage.getItem('tic-tac-toe'));
 
+    // if it's empty, do early return
     if(gameData === null) {
       return null;
     }
@@ -151,34 +161,54 @@ const DOM = {
     // close the "gameSettingScreen" by removing "active" class
     $("#gameSettingScreen").attr("class", "");
 
+    // set local storage data in business logic variables
+    board.gameBoard = gameData.board.gameBoard;
+    board.boardSize = gameData.board.size;
+    player.players = gameData.players;
+    game.gameCounter = gameData.game.gameCounter;
+    game.currentPlayer = gameData.game.currentPlayer;
 
+    console.log("first player from the local storage: "+ gameData.game.currentPlayer.name);
 
-    console.log(gameData)
-  }
+    // and draw game board with those
+    this.drawGameBoard();
+  },
+
+  cleanTheLocalStorageData: function() {
+    localStorage.removeItem('tic-tac-toe');
+  },
 }
 
-// DOM.saveInLocalStorage();
-// DOM.useLocalStorageData();
+const initialiseGameBoard = function(boardSize) {
+  // initialise gameCounter for new game
+  game.gameCounter = 0;
+  // initialise the game board
+  board.initialise(boardSize);
+  // clean the result screen
+  DOM.cleanTheGameResult();
+  // draw the initialised game board in the DOM
+  DOM.drawGameBoard();
+  // update players name and token
+  DOM.updatePlayersInfo();
+  // save initialised values in the local storage
+  DOM.saveInLocalStorage();
+}
 
-// when its loaded
-board.initialise();
-DOM.drawGameBoard();
 
+// when browser is loaded
+$(document).ready(function() {
+  // check local storage first
+  DOM.getLocalStorageData();
+  DOM.updatePlayersInfo();
+})
 
 // playAgain button click event handler
 $("#playAgainBtn").on("click", function() {
-  // clean the result screen
-  DOM.cleanTheGameResult();
-  // initialise the game board
-  board.initialise();
-  // draw the initialised game board in the DOM
-  DOM.drawGameBoard();
+  initialiseGameBoard();
 });
 
 // newGame button click event handler
 $("#playNewGameBtn").on("click", function() {
-  // clean the result screen
-  DOM.cleanTheGameResult();
   // activate the game setting screen
   $("#gameSettingScreen").attr("class", "active");
 });
@@ -199,20 +229,12 @@ $("#playersInfoForm").on("submit", function(event) {
   // put the value in the business logic part
   player.changePlayersName(player1Name, player2Name);
   player.changePlayersToken(player1Token, player2Token);
-  // and update the DOM as well
-  DOM.updatePlayersInfo();
 
   // get a board size
   const boardSize = parseInt($("#boardSize").val());
-
-  // initialise the game board with user's size input
-  board.initialise(boardSize);
-
-  // and draw the game board in the DOM
-  DOM.drawGameBoard();
+  // initialise game board with the boardSize
+  initialiseGameBoard(boardSize);
 
   // close the "gameSettingScreen" by removing "active" class
   $("#gameSettingScreen").attr("class", "");
-
-  DOM.saveInLocalStorage();
 });
