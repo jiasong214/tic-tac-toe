@@ -47,49 +47,51 @@
       </h2>
       <img class="gameSettingScreen__img" src="https://assets.website-files.com/5e51b3b0337309d672efd94c/5e53682233d368dfa63e7deb_slider-1.svg" alt="">
 
-      <!-- <div class="buttons-wrapper">
-        <button id="">Play with a Friend</button>
-        <button id="">Play with AI</button>
-      </div> -->
-
-      <div class="playersInfoForm-wrapper">
-        <form id="playersInfoForm">
-          <div>
-            <h2>Player 1</h2>
-            <input type="text" id="player1Name" placeholder="Player1 name">
-            <select name="" id="player1Token">
-              <option value="O">O</option>
-              <option value="❤️">❤️</option>
-              <option value="🥰">🥰</option>
-            </select>
-          </div>
-
-          <div>
-            <h2>Player 2</h2>
-            <input type="text" id="player2Name" placeholder="Player2 name">
-            <select name="" id="player2Token">
-              <option value="X">X</option>
-              <option value="🥶">🥶</option>
-              <option value="🤢">🤢</option>
-            </select>
-          </div>
-
-          <div>
-            <h2>board size</h2>
-            <select id="boardSize">
-              <option value="3">3</option>
-              <option value="4">4</option>
-              <option value="5">5</option>
-              <option value="6">6</option>
-              <option value="7">7</option>
-              <option value="8">8</option>
-              <option value="9">9</option>
-            </select>
-          </div>
-
-          <button type="submit">Play</button>
-        </form>
+      <div class="gameTypeButtons-wrapper">
+        <h2>Please select a game type.</h2>
+        <div>
+          <button id="multiplayerBtn">Play with a Friend</button>
+          <button id="singlePlayerBtn">Play with AI</button>
+        </div>
       </div>
+
+
+      <form id="playersInfoForm">
+        <div>
+          <h2>Player 1</h2>
+          <input type="text" id="player1Name" placeholder="Player1 name">
+          <select name="" id="player1Token">
+            <option value="O">O</option>
+            <option value="❤️">❤️</option>
+            <option value="🥰">🥰</option>
+          </select>
+        </div>
+
+        <div class="playersInfoForm__player2">
+          <h2>Player 2</h2>
+          <input type="text" id="player2Name" placeholder="Player2 name">
+          <select name="" id="player2Token">
+            <option value="X">X</option>
+            <option value="🥶">🥶</option>
+            <option value="🤢">🤢</option>
+          </select>
+        </div>
+
+        <div>
+          <h2>board size</h2>
+          <select id="boardSize">
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+          </select>
+        </div>
+
+        <button type="submit">Play</button>
+      </form>
 
     </div>
 

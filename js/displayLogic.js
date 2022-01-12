@@ -138,6 +138,22 @@ const DOM = {
     this.activeCurrentPlayer();
     // save current variables in the local storage
     DOM.saveInLocalStorage();
+
+    // if a user is playing with AI
+    if(game.singlePlayer) {
+      // AI should click a piece here
+    }
+  },
+
+  bringTheGameSettingScreen: function(delay) {
+    //clear the local storage
+    DOM.clearTheLocalStorageData();
+    // activate the game setting screen
+    $("#gameSettingScreen").addClass("active");
+    setTimeout(() => {
+      $(".gameTypeButtons-wrapper").addClass("active");
+    }, delay);
+    $("#playersInfoForm").removeClass("active");
   },
 
   // this will run every time when a user clicks the gameBoard
@@ -150,6 +166,7 @@ const DOM = {
       },
       game: {
         currentPlayer: game.currentPlayer,
+        singlePlayer: game.singlePlayer,
         gameCounter: game.gameCounter
       }
     }
@@ -165,11 +182,11 @@ const DOM = {
 
     // if it's empty, do early return
     if(gameData === null) {
-      return null;
+      return false;
     }
 
     // close the "gameSettingScreen" by removing "active" class
-    $("#gameSettingScreen").attr("class", "");
+    $("#gameSettingScreen").addClass("class");
 
     // set local storage data in business logic variables
     board.gameBoard = gameData.board.gameBoard;
@@ -177,10 +194,15 @@ const DOM = {
     player.players = gameData.players;
     game.gameCounter = gameData.game.gameCounter;
     game.currentPlayer = gameData.game.currentPlayer;
+    game.singlePlayer = gameData.game.singlePlayer;
 
     // and draw game board with those
     this.drawGameBoard();
   },
+
+  clearTheLocalStorageData: function() {
+    localStorage.clear("tic-tac-toe");
+  }
 }
 
 // initialise game board (except player's info)
@@ -204,26 +226,34 @@ const initialiseGameBoard = function(boardSize) {
 // when browser is loaded
 $(document).ready(function() {
   // check local storage first
-  DOM.getLocalStorageData();
+  const LSData = DOM.getLocalStorageData();
+
+  if(LSData === false) {
+    DOM.bringTheGameSettingScreen();
+  }
+
   DOM.updatePlayersInfo();
   // indicate the current player in the DOM
   DOM.activeCurrentPlayer();
 })
+
 
 // playAgain button click event handler
 $("#playAgainBtn").on("click", function() {
   initialiseGameBoard();
 });
 
+
 // newGame button click event handler
 $("#playNewGameBtn").on("click", function() {
-  // activate the game setting screen
-  $("#gameSettingScreen").attr("class", "active");
+  DOM.bringTheGameSettingScreen(1500);
 });
 
+
 $("#exitBtn").on("click", function() {
-  $("#gameSettingScreen").attr("class", "active");
+  DOM.bringTheGameSettingScreen(1500);
 });
+
 
 // form submit event handler
 $("#playersInfoForm").on("submit", function(event) {
@@ -232,7 +262,11 @@ $("#playersInfoForm").on("submit", function(event) {
 
   // get players names from the input. if a user didn't type anything, set it default value as "Player1"
   const player1Name = $("#player1Name").val() || "Player1";
-  const player2Name = $("#player2Name").val() || "Player2";
+  let player2Name = $("#player2Name").val() || "Player2";
+
+  if(game.singlePlayer) {
+    player2Name = "Robot";
+  }
 
   // get players tokens
   const player1Token = $("#player1Token").val();
@@ -247,6 +281,36 @@ $("#playersInfoForm").on("submit", function(event) {
   // initialise game board with the boardSize
   initialiseGameBoard(boardSize);
 
-  // close the "gameSettingScreen" by removing "active" class
-  $("#gameSettingScreen").attr("class", "");
+  // close everything by removing "active" class
+  $("#gameSettingScreen").removeClass("active");
+  $("#playersInfoForm").removeClass("active");
+});
+
+
+// multiplayer button click event handler
+$("#multiplayerBtn").on("click", function() {
+  // update business logic variable
+  game.singlePlayer = false;
+
+  // close the game type modal
+  $(".gameTypeButtons-wrapper").removeClass("active");
+  // open the player info form
+  $("#playersInfoForm").addClass("active");
+});
+
+
+// single player button click event handler
+$("#singlePlayerBtn").on("click", function() {
+  // update business logic variable
+  game.singlePlayer = true;
+
+  // close the game type modal
+  $(".gameTypeButtons-wrapper").removeClass("active");
+  // block the player2 inputs
+  $(".playersInfoForm__player2").css({
+    "opacity": 0.2,
+    "pointer-events": "none",
+  });
+  // show a user playerInfoForm
+  $("#playersInfoForm").addClass("active");
 });

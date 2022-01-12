@@ -19,10 +19,6 @@
   border: 20px solid var(--blue-color);
 }
 
-#gameSettingScreen.active #playersInfoForm {
-  opacity: 1;
-}
-
 .gameSettingScreen__title {
   font-size: 200px;
   color: var(--blue-color);
@@ -38,18 +34,54 @@
   transform: scaleX(-1);
 }
 
+.gameTypeButtons-wrapper,
 #playersInfoForm {
-  width: 500px;
+  /* display: none; */
   padding: 50px 100px;
   background: white;
   border: 3px solid black;
   box-shadow: 10px 10px var(--blue-color);
   opacity: 0;
+  pointer-events: none;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   transition: 0.3s;
+}
+
+.gameTypeButtons-wrapper.active,
+#playersInfoForm.active {
+  opacity: 1;
+  pointer-events: auto;
+  transition: 0.3s;
+}
+
+.gameTypeButtons-wrapper > h2 {
+  margin-bottom: 30px;
+  font-size: 24px;
+  text-align: center;
+}
+
+.gameTypeButtons-wrapper > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.gameTypeButtons-wrapper button {
+  all: unset;
+  display: block;
+  padding: 20px 50px;
+  background: black;
+  border: 3px solid black;
+  color: white;
+  cursor: pointer;
+}
+.gameTypeButtons-wrapper button:hover {
+  border: 3px solid var(--yellow-color);
+  background: var(--red-color);
+  color: white;
 }
 
 #playersInfoForm > * {

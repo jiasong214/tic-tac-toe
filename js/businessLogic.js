@@ -61,6 +61,7 @@ const player = {
 const game = {
   // set a default current player
   currentPlayer: player.players.player1,
+  singlePlayer: true,
   gameCounter: 0,
 
   swapPlayer: function() {    
