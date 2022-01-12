@@ -105,44 +105,48 @@ const DOM = {
     // get data from business part
     const currentPlayer = game.currentPlayer;
 
-    // mark the "gameBoard" array
+    // 0. if a user is playing with AI
+    console.log(game.singlePlayer, game.currentPlayer.name)
+    if(game.singlePlayer && game.currentPlayer.name === "Robot") {
+      // AI should click a cell here
+      const position = game.AIPlay();
+
+      this.clickBoard(position[0], position[1]);
+    }
+
+    // 1. mark the "gameBoard" array
     const isMarked = board.mark(column, row, currentPlayer);
 
-    // if the piece was already marked, return null
+    // if the cell was already marked, return null
     if(isMarked === false) {
       return null;
     }
 
-    // update the board in the DOM
+    // 2. update the board in the DOM
     this.markGameBoard(column, row, currentPlayer);
 
-    // check the game result
+    // 3. check the game result
     if(game.checkWin() !== undefined) {
-      const matchedPiecesArr = game.checkWin();
-      this.markResultOnGameBoard(matchedPiecesArr);
+      const matchedCellsArr = game.checkWin();
+      this.markResultOnGameBoard(matchedCellsArr);
       this.displayGameResult(currentPlayer);
 
       return null;
     }
 
-    // if nobody win yet, check if the game is drawn
+    // 4. if nobody win yet, check if the game is drawn
     if(game.checkDraw()) {
       this.displayGameResult();
 
       return null;
     }
 
-    // if game is still going, swap the player
+    // 5. if game is still going, swap the player
     game.swapPlayer();
-    // and active effect of the other player to play
+    // and active the effect of the other player to play
     this.activeCurrentPlayer();
-    // save current variables in the local storage
+    // and save the current variables in the local storage
     DOM.saveInLocalStorage();
-
-    // if a user is playing with AI
-    if(game.singlePlayer) {
-      // AI should click a piece here
-    }
   },
 
   bringTheGameSettingScreen: function(delay) {
@@ -186,7 +190,8 @@ const DOM = {
     }
 
     // close the "gameSettingScreen" by removing "active" class
-    $("#gameSettingScreen").addClass("class");
+    $("#gameSettingScreen").removeClass("active");
+    $("#playersInfoForm").removeClass("active");
 
     // set local storage data in business logic variables
     board.gameBoard = gameData.board.gameBoard;
@@ -205,23 +210,22 @@ const DOM = {
   }
 }
 
-// initialise game board (except player's info)
-const initialiseGameBoard = function(boardSize) {
-  // initialise gameCounter for new game
+// reset game board (except player's info)
+const resetGameBoard = function(boardSize) {
+  // reset gameCounter for new game
   game.gameCounter = 0;
-  // initialise the game board 
-  // it'll initialise the board to same size with before if you don't put argument
+  // reset the game board 
+  // it'll reset the board to same size with before if you don't put argument
   board.initialise(boardSize);
   // clean the result screen
   DOM.cleanTheGameResult();
-  // draw the initialised game board in the DOM
+  // draw the reset game board in the DOM
   DOM.drawGameBoard();
   // update players name and token
   DOM.updatePlayersInfo();
-  // save initialised values in the local storage
+  // save reset values in the local storage
   DOM.saveInLocalStorage();
 }
-
 
 // when browser is loaded
 $(document).ready(function() {
@@ -237,23 +241,19 @@ $(document).ready(function() {
   DOM.activeCurrentPlayer();
 })
 
-
 // playAgain button click event handler
 $("#playAgainBtn").on("click", function() {
-  initialiseGameBoard();
+  resetGameBoard();
 });
-
 
 // newGame button click event handler
 $("#playNewGameBtn").on("click", function() {
   DOM.bringTheGameSettingScreen(1500);
 });
 
-
 $("#exitBtn").on("click", function() {
   DOM.bringTheGameSettingScreen(1500);
 });
-
 
 // form submit event handler
 $("#playersInfoForm").on("submit", function(event) {
@@ -278,14 +278,13 @@ $("#playersInfoForm").on("submit", function(event) {
 
   // get a board size
   const boardSize = parseInt($("#boardSize").val());
-  // initialise game board with the boardSize
-  initialiseGameBoard(boardSize);
+  // reset game board with the boardSize
+  resetGameBoard(boardSize);
 
   // close everything by removing "active" class
   $("#gameSettingScreen").removeClass("active");
   $("#playersInfoForm").removeClass("active");
 });
-
 
 // multiplayer button click event handler
 $("#multiplayerBtn").on("click", function() {
@@ -297,7 +296,6 @@ $("#multiplayerBtn").on("click", function() {
   // open the player info form
   $("#playersInfoForm").addClass("active");
 });
-
 
 // single player button click event handler
 $("#singlePlayerBtn").on("click", function() {

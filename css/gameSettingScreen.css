@@ -36,25 +36,22 @@
 
 .gameTypeButtons-wrapper,
 #playersInfoForm {
-  /* display: none; */
+  display: none;
   padding: 50px 100px;
   background: white;
   border: 3px solid black;
   box-shadow: 10px 10px var(--blue-color);
-  opacity: 0;
   pointer-events: none;
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  transition: 0.3s;
 }
 
 .gameTypeButtons-wrapper.active,
 #playersInfoForm.active {
-  opacity: 1;
+  display: block;
   pointer-events: auto;
-  transition: 0.3s;
 }
 
 .gameTypeButtons-wrapper > h2 {

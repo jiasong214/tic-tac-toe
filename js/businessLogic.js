@@ -5,7 +5,7 @@ const board = {
 
   // create a game board and fill it with an empty string
   initialise: function(size) {
-    // initialise gameBoard array
+    // reset the gameBoard array
     this.gameBoard = [];
     // set the board size. if argument is not exist, it'll use former of "boardSize"
     this.boardSize = size || this.boardSize;
@@ -78,7 +78,7 @@ const game = {
 
     const currentBoard = board.gameBoard;
 
-    let ref = currentBoard[0][0];
+    let current = currentBoard[0][0];
     let counter = 0;
 
     // 1. check rows
@@ -86,36 +86,36 @@ const game = {
       let answerTracker = [];
 
       for(let j=0; j<currentBoard.length; j++) {
-        // if ref is "" or is not matched with the current piece, 
-        // initialise the counter and move the ref to the next piece.
-        if(ref === "" || ref !== currentBoard[i][j]) {
-          // initialise the counter and answerTracker for the next column check
+        // if current is "" or is not matched with the current cell, 
+        // reset the counter and move the current to the next cell.
+        if(current === "" || current !== currentBoard[i][j]) {
+          // reset the counter and answerTracker for the next column check
           counter = 0;
           answerTracker = [];
 
           // move to the next column
-          ref = currentBoard[i][j];
+          current = currentBoard[i][j];
         }
   
-        // if ref is not "" and is matched with the current piece,
-        if(ref !== "" && ref === currentBoard[i][j]) {
+        // if current is not "" and is matched with the current cell,
+        if(current !== "" && current === currentBoard[i][j]) {
           // add counter
           counter++;
           // push the current combination to the "answerTracker"
           answerTracker.push([i, j]);
 
-          // if the counter is 3 (3 pieces are matched in a row), return answerTracker
+          // if the counter is 3 (3 cells are matched in a row), return answerTracker
           if(counter === 3) {
             return answerTracker;
           }
         }
       }
-      // initialise counter before check next column
+      // reset the counter before check next column
       counter = 0;
     }
 
-    // initialise ref
-    ref = currentBoard[0][0];
+    // reset the current
+    current = currentBoard[0][0];
 
     // 2. check columns
     for(let i=0; i<currentBoard.length; i++) {
@@ -123,13 +123,13 @@ const game = {
 
 
       for(let j=0; j<currentBoard.length; j++) {
-        if(ref === "" || ref !== currentBoard[j][i]) {
+        if(current === "" || current !== currentBoard[j][i]) {
           counter = 0;
           answerTracker = [];
-          ref = currentBoard[j][i];
+          current = currentBoard[j][i];
         }
   
-        if(ref === currentBoard[j][i]) {
+        if(current === currentBoard[j][i]) {
           counter++;
           answerTracker.push([j, i]);
 
@@ -141,19 +141,19 @@ const game = {
       counter=0;
     }
 
-    ref = currentBoard[0][0];
+    current = currentBoard[0][0];
 
     let answerTracker = [];
 
     // 3. check diagonal top right
     for(let i=0; i<currentBoard.length; i++) {
-      if(ref === "" || ref !== currentBoard[i][i]) {
+      if(current === "" || current !== currentBoard[i][i]) {
         counter = 0;
         answerTracker = [];
-        ref = currentBoard[i][i];
+        current = currentBoard[i][i];
       }
   
-      if(ref === currentBoard[i][i]) {
+      if(current === currentBoard[i][i]) {
         counter++;
         answerTracker.push([i, i]);
 
@@ -163,19 +163,19 @@ const game = {
       }
     }
 
-    ref = currentBoard[0][0];
+    current = currentBoard[0][0];
     counter = 0;
     answerTracker = [];
 
     // 4. check diagonal top left
     for(let i=0; i<currentBoard.length; i++) {
-      if(ref === "" || ref !== currentBoard[i][currentBoard.length-i-1]) {
+      if(current === "" || current !== currentBoard[i][currentBoard.length-i-1]) {
         counter = 0;
         answerTracker = [];
-        ref = currentBoard[i][currentBoard.length-i-1];
+        current = currentBoard[i][currentBoard.length-i-1];
       }
   
-      if(ref === currentBoard[i][currentBoard.length-i-1]) {
+      if(current === currentBoard[i][currentBoard.length-i-1]) {
         counter++;
         answerTracker.push([i, currentBoard.length-i-1]);
 
@@ -187,10 +187,20 @@ const game = {
   },
 
   checkDraw: function() {
-    const totalPieces = Math.pow(parseInt(board.gameBoard.length), 2);
-    // if the players play games as many time as totalPieces - 1, the game is drawn
-    if(this.gameCounter >= totalPieces -1) {
+    const totalCells = Math.pow(parseInt(board.gameBoard.length), 2);
+    // if the players play games as many time as totalCells - 1, the game is drawn
+    if(this.gameCounter >= totalCells -1) {
       return true;
     }
   },
+
+  AIPlay: function() {
+    const column = parseInt(Math.random() * board.boardSize);
+    const row = parseInt(Math.random() * board.boardSize);
+
+    console.log(column, row)
+
+    return [column, row];
+  }
+
 }
