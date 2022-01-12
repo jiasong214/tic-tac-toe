@@ -63,8 +63,8 @@ const game = {
   currentPlayer: player.players.player1,
   gameCounter: 0,
 
-  swapPlayer: function() {
-    if(this.currentPlayer === player.players.player1) {
+  swapPlayer: function() {    
+    if(this.currentPlayer.name === player.players.player1.name) {
       this.currentPlayer = player.players.player2;
     }else {
       this.currentPlayer = player.players.player1;

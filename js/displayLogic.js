@@ -54,6 +54,19 @@ const DOM = {
     $("#player2 > p").html(playersInfo.player2.token);
   },
 
+  activeCurrentPlayer: function() {
+    const currentPlayer = game.currentPlayer;
+
+    $(".playersBar__player img").css({
+      "width": "180px",
+      "filter": "opacity(0.2)"
+    });
+    $(`#player${currentPlayer.id} img`).css({
+      "width": "200px",
+      "filter": "none",
+    });
+  },
+
   displayGameResult: function(winner) {
     // block the click event
     $("#board").css("pointer-events", "none");
@@ -68,7 +81,7 @@ const DOM = {
       }else {
         // if one player win, 
         $(".resultScreen__text").html(`${winner.name} wins!`);
-        $(".playersBar__player img").css("filter", "brightness(0.2)");
+        $(".playersBar__player img").css("filter", "opacity(0.2)");
         $(`#player${winner.id} img`).css({
           "width": "360px",
           "filter": "none",
@@ -78,11 +91,6 @@ const DOM = {
       // enable the click event for next game
       $("#board").css("pointer-events", "auto");
     }, 500);
-
-    // 
-    board.initialise();
-    game.gameCounter = 0;
-    DOM.saveInLocalStorage();
   },
 
   cleanTheGameResult: function() {
@@ -96,7 +104,6 @@ const DOM = {
   clickBoard: function(column, row) {
     // get data from business part
     const currentPlayer = game.currentPlayer;
-    console.log("current player: "+currentPlayer.name)
 
     // mark the "gameBoard" array
     const isMarked = board.mark(column, row, currentPlayer);
@@ -127,10 +134,13 @@ const DOM = {
 
     // if game is still going, swap the player
     game.swapPlayer();
-
+    // and active effect of the other player to play
+    this.activeCurrentPlayer();
+    // save current variables in the local storage
     DOM.saveInLocalStorage();
   },
 
+  // this will run every time when a user clicks the gameBoard
   saveInLocalStorage: function() {
     const gameData = {
       players: player.players,
@@ -142,13 +152,13 @@ const DOM = {
         currentPlayer: game.currentPlayer,
         gameCounter: game.gameCounter
       }
-    } 
-    console.log("next player: " + JSON.stringify(gameData.game.currentPlayer))
+    }
 
     // save these in local storage
     localStorage.setItem("tic-tac-toe", JSON.stringify(gameData));
   },
 
+  // this will run when a user refresh the browser, or start a new game
   getLocalStorageData: function() {
     // get local storage data
     const gameData = JSON.parse(localStorage.getItem('tic-tac-toe'));
@@ -168,21 +178,17 @@ const DOM = {
     game.gameCounter = gameData.game.gameCounter;
     game.currentPlayer = gameData.game.currentPlayer;
 
-    console.log("first player from the local storage: "+ gameData.game.currentPlayer.name);
-
     // and draw game board with those
     this.drawGameBoard();
   },
-
-  cleanTheLocalStorageData: function() {
-    localStorage.removeItem('tic-tac-toe');
-  },
 }
 
+// initialise game board (except player's info)
 const initialiseGameBoard = function(boardSize) {
   // initialise gameCounter for new game
   game.gameCounter = 0;
-  // initialise the game board
+  // initialise the game board 
+  // it'll initialise the board to same size with before if you don't put argument
   board.initialise(boardSize);
   // clean the result screen
   DOM.cleanTheGameResult();
@@ -200,6 +206,8 @@ $(document).ready(function() {
   // check local storage first
   DOM.getLocalStorageData();
   DOM.updatePlayersInfo();
+  // indicate the current player in the DOM
+  DOM.activeCurrentPlayer();
 })
 
 // playAgain button click event handler
