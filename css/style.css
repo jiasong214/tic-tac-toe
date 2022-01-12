@@ -35,15 +35,37 @@ body {
 header {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 10px 50px;
 }
 
 .header__title {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 600;
 }
 
 .header__exitBtn {
+  all: unset;
+  display: block;
+  padding: 5px 20px;
+  background: black;
+  box-shadow: 5px 5px var(--yellow-color);
+  font-size: 14px;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  cursor: pointer;
+  position: relative;
+  top: 0;
+  left: 0;
+  transition: 0.3s;
+}
+
+.header__exitBtn:hover {
+  box-shadow: none;
+  top: 2px;
+  left: 2px;
+  transition: 0.3s;
 }
 
 footer {

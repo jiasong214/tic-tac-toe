@@ -221,6 +221,10 @@ $("#playNewGameBtn").on("click", function() {
   $("#gameSettingScreen").attr("class", "active");
 });
 
+$("#exitBtn").on("click", function() {
+  $("#gameSettingScreen").attr("class", "active");
+});
+
 // form submit event handler
 $("#playersInfoForm").on("submit", function(event) {
   // prevent refresh

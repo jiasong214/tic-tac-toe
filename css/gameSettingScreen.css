@@ -8,7 +8,7 @@
   left: 0;
   z-index: 52;
   transform: translate(100%, -100%) rotate(180deg);
-  transition: border-width 1s, transform 1s 1s;
+  transition: border-width 1s, transform 1s 0.5s;
 
   /* display: none; */
 }
