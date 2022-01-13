@@ -27,17 +27,18 @@
 }
 
 .gameSettingScreen__img {
-  width: 40vw;
+  width: 600px;
   position: absolute;
   bottom: -9%;
-  right: -3%;
+  right: -80px;
   transform: scaleX(-1);
 }
 
 .gameTypeButtons-wrapper,
 #playersInfoForm {
   display: none;
-  padding: 50px 100px;
+  min-width: 500px;
+  padding: 50px;
   background: white;
   border: 3px solid black;
   box-shadow: 10px 10px var(--blue-color);
@@ -61,9 +62,9 @@
 }
 
 .gameTypeButtons-wrapper > div {
+  width: 450px;
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
+  justify-content: space-around;
 }
 
 .gameTypeButtons-wrapper button {

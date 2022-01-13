@@ -21,6 +21,7 @@
 .playersBar__player img {
   display: block;
   width: 180px;
+  pointer-events: none;
   position: absolute;
   left: 50%;
   bottom: 85px;

@@ -220,6 +220,8 @@ const DOM = {
     game.currentPlayer = gameData.game.currentPlayer;
     game.singlePlayer = gameData.game.singlePlayer;
 
+    board.setNumberToWin();
+
     // and draw game board with those
     this.drawGameBoard();
   },

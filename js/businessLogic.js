@@ -6,6 +6,11 @@ const board = {
   // number of tokens in a row to win
   numberToWin: 3,
 
+  setNumberToWin: function() {
+    // set the number of tokens needed in a row to win depending on boardSize
+    this.numberToWin = this.boardSize > 4 ? 4 : 3;
+  },
+
   // create the game board and initialise each cell with an empty string
   initialise: function(size) {
     // reset the gameBoard array
@@ -13,7 +18,7 @@ const board = {
     // set the board size. if argument not given, it'll use "boardSize" property
     this.boardSize = size || this.boardSize;
     // set the number of tokens needed in a row to win depending on boardSize
-    this.numberToWin = this.boardSize > 4 ? 4 : 3;
+    this.setNumberToWin();
 
     // generate 2D array filling it with empty strings
     for(let i=0; i<this.boardSize; i++) {
