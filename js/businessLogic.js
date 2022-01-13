@@ -332,8 +332,8 @@ const game = {
 
   checkDraw: function() {
     const totalCells = Math.pow(parseInt(board.gameBoard.length), 2);
-    // if the players play games as many time as totalCells - 1 without winning conditions, the game is drawn
-    if(this.gameCounter >= totalCells -1) {
+    // if the players play games as many time as totalCells without winning move, the game is drawn
+    if(this.gameCounter >= totalCells ) {
       return true;
     }
   },
@@ -347,7 +347,7 @@ const AI = {
   },
 
   isValidCell: function(row, column) {
-    if(row >= board.boardSize || column >= board.boardSize) {
+    if(row >= board.boardSize || row < 0 || column >= board.boardSize || column < 0) {
       return false;
     }else {
       return true;
@@ -562,6 +562,38 @@ const AI = {
     return false;
   },
 
+  // this will return a random position that is close to any token
+  getClosePosition: function() {
+    const currentBoard = board.gameBoard;
+    const closePositionsArr = [];
+
+    for(let i=currentBoard.length-1; i>=0; i--) {
+      for(let j=currentBoard.length-1; j>=0; j--) {
+        const randomIndex = Math.floor(Math.random() * 8);
+
+        // find any cell marked
+        if(currentBoard[i][j] !== "") {
+          const closeCells = [
+            [i, j-1], [i, j+1], [i-1, j], [i+1, j], [i-1, j-1], [i+1, j+1], [i-1, j+1], [i+1, j-1]
+          ]
+          // and push random close cell
+          closePositionsArr.push(closeCells[randomIndex]);
+        }
+      }
+    }
+
+    // within closePositionsArr, find valid position, and return it
+    for(let position of closePositionsArr) {
+      const row = position[0];
+      const column = position[1];
+      if(this.isValidCell(row, column) && this.isEmptyCell(row, column)) {
+        return position;
+      }
+    }
+
+    return false;
+  },
+
   chooseCell: function() {
     // if the board is empty, put the token in random position
     if(game.gameCounter === 0) {
@@ -601,9 +633,16 @@ const AI = {
       return check4;
     }
 
-    console.log({rowArr, columnArr, diagonalArr1, diagonalArr2})
+    // console.log({rowArr, columnArr, diagonalArr1, diagonalArr2})
 
-    // if there is no winning positions, return a random position
+
+    // if there wasn't a winning move, choose any cell close to other token
+    const anyClosePosition = this.getClosePosition();
+    if(anyClosePosition) {
+      return anyClosePosition;
+    }
+
+    // return a random position if everything else fails
     return this.generateRandomPosition();
   }
 }
