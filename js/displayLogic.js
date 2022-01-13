@@ -23,7 +23,7 @@ const DOM = {
       }
     }
 
-    // connect to the event handler
+    // connect to the click event handler
     $("#board > div").on("click", function() {
 
       const row = $(this).attr("data-row");
@@ -35,7 +35,7 @@ const DOM = {
 
   markGameBoard: function(row, column, currentPlayer) {
     const targetElement = $(`div[data-row='${row}'][data-column='${column}']`);
-    targetElement.html(`<span>${currentPlayer.token}</span>`)
+    targetElement.html(`<span>${currentPlayer.token}</span>`);
   },
 
   markResultOnGameBoard: function(resultArr) {
@@ -77,10 +77,10 @@ const DOM = {
       $("#resultScreen").css("display", "block");
 
       if(winner === undefined) {
-        // if
+        // if the game is drawn
         $(".resultScreen__text").html(`Draw!`);
       }else {
-        // if one player win, 
+        // if one player wins, display their name
         $(".resultScreen__text").html(`${winner.name} wins!`);
         $(".playersBar__player img").css("filter", "opacity(0.2)");
         $(`#player${winner.id} img`).css({
@@ -103,7 +103,7 @@ const DOM = {
   },
 
   clickBoard: function(row, column) {
-    // get data from business part
+    // get the current player from the business part
     const currentPlayer = game.currentPlayer;
 
     // 1. mark the "gameBoard" array
@@ -111,7 +111,6 @@ const DOM = {
 
     // if the cell was already marked, return null
     if(isMarked === false) {
-      console.log("robot choose wrong one")
       return null;
     }
 
@@ -120,14 +119,17 @@ const DOM = {
 
     // 3. check the game result
     if(game.checkWin() !== undefined) {
-      const matchedCellsArr = game.checkWin();
-      this.markResultOnGameBoard(matchedCellsArr);
+      // get the cell positions
+      const winningPositionsArr = game.checkWin();
+      // and mark in the DOM with it
+      this.markResultOnGameBoard(winningPositionsArr);
+      // and display winner
       this.displayGameResult(currentPlayer);
 
       return null;
     }
 
-    // 4. if nobody win yet, check if the game is drawn
+    // 4. if nobody won yet, check if the game is drawn
     if(game.checkDraw()) {
       this.displayGameResult();
 
@@ -137,35 +139,40 @@ const DOM = {
 
     // 5. if game is still going, swap the player
     game.swapPlayer();
-    // and active the effect of the other player to play
+    // and activate the effect of the other player to play
     this.activeCurrentPlayer();
     // and save the current variables in the local storage
     DOM.saveInLocalStorage();
 
 
-    // 6. if a user is playing with AI, and next turn is "Robot"
+    // 6. if a user is playing with AI, then next turn is "Robot"
     if(game.currentPlayer.name === "Robot") {
-      this.playWithAI()
+      // disable click while robot is thinking
+      $("#board").css("pointer-events", "none");
+      this.playWithAI();
     }
   },
 
   playWithAI: function() {
     // delay for smoother animation
     setTimeout(function() {
-      // get the position from logic part
+      // get the best position from logic part
       const position = AI.chooseCell();
 
-      console.log(`Robot choose ${position}`)
       // and click the board
       DOM.clickBoard(position[0], position[1]);
-    }, 1000)
+
+      // and re-enable click event for the board
+      $("#board").css("pointer-events", "auto");
+    }, 500);
   },
 
   bringTheGameSettingScreen: function(delay) {
-    //clear the local storage
+    // clear the local storage
     DOM.clearTheLocalStorageData();
     // activate the game setting screen
     $("#gameSettingScreen").addClass("active");
+    // delay for animation
     setTimeout(() => {
       $(".gameTypeButtons-wrapper").addClass("active");
     }, delay);
@@ -187,16 +194,16 @@ const DOM = {
       }
     }
 
-    // save these in local storage
+    // save the object in local storage
     localStorage.setItem("tic-tac-toe", JSON.stringify(gameData));
   },
 
-  // this will run when a user refresh the browser, or start a new game
+  // this will run when a user refreshes the browser, or starts a new game
   getLocalStorageData: function() {
-    // get local storage data
+    // get the local storage data
     const gameData = JSON.parse(localStorage.getItem('tic-tac-toe'));
 
-    // if it's empty, do early return
+    // if it's empty, do an early return
     if(gameData === null) {
       return false;
     }
@@ -205,7 +212,7 @@ const DOM = {
     $("#gameSettingScreen").removeClass("active");
     $("#playersInfoForm").removeClass("active");
 
-    // set local storage data in business logic variables
+    // set the business logic variables with local storage data
     board.gameBoard = gameData.board.gameBoard;
     board.boardSize = gameData.board.size;
     player.players = gameData.players;
@@ -222,12 +229,14 @@ const DOM = {
   }
 }
 
-// reset game board (except player's info)
+// reset the game board (except the player's info)
 const resetGameBoard = function(boardSize) {
-  // reset gameCounter for new game
+  // reset gameCounter for a new game
   game.gameCounter = 0;
+  // reset the currentPlayer to avoid robot starting first
+  game.currentPlayer = player.players.player1;
   // reset the game board 
-  // it'll reset the board to same size with before if you don't put argument
+  // it'll reset the board to same size as before if you don't put any argument
   board.initialise(boardSize);
   // clean the result screen
   DOM.cleanTheGameResult();
@@ -239,9 +248,9 @@ const resetGameBoard = function(boardSize) {
   DOM.saveInLocalStorage();
 }
 
-// when browser is loaded
+// when the browser is loaded
 $(document).ready(function() {
-  // check local storage first
+  // check the local storage first
   const LSData = DOM.getLocalStorageData();
 
   if(LSData === false) {
@@ -252,7 +261,7 @@ $(document).ready(function() {
   // indicate the current player in the DOM
   DOM.activeCurrentPlayer();
 
-  // if next turn was "Robot", 
+  // if the next turn was "Robot", then "Robot" will play automatically
   if(game.currentPlayer.name === "Robot") {
     DOM.playWithAI();
   }
@@ -277,25 +286,31 @@ $("#playersInfoForm").on("submit", function(event) {
   // prevent refresh
   event.preventDefault();
 
-  // get players names from the input. if a user didn't type anything, set it default value as "Player1"
+  // get players names from the input. if a user didn't type anything, set it's default value as "Player1"
   const player1Name = $("#player1Name").val() || "Player1";
   let player2Name = $("#player2Name").val() || "Player2";
 
+  // if a user is playing with AI, set player2 "Robot"
   if(game.singlePlayer) {
     player2Name = "Robot";
   }
 
-  // get players tokens
+  // player names can't be same
+  if(player1Name === player2Name) {
+    return null
+  }
+
+  // get player tokens
   const player1Token = $("#player1Token").val();
   const player2Token = $("#player2Token").val();
 
-  // put the value in the business logic part
+  // save the input values in the business logic part
   player.changePlayersName(player1Name, player2Name);
   player.changePlayersToken(player1Token, player2Token);
 
-  // get a board size
+  // get a board size 
   const boardSize = parseInt($("#boardSize").val());
-  // reset game board with the boardSize
+  // reset game board with the input boardSize
   resetGameBoard(boardSize);
 
   // close everything by removing "active" class
@@ -305,18 +320,21 @@ $("#playersInfoForm").on("submit", function(event) {
 
 // multiplayer button click event handler
 $("#multiplayerBtn").on("click", function() {
-  // update business logic variable
+  // save game type in logic part
   game.singlePlayer = false;
 
-  // close the game type modal
+  // close the game-type modal
   $(".gameTypeButtons-wrapper").removeClass("active");
+  $(".playersInfoForm__player2").css({
+    "opacity": 1,
+    "pointer-events": "auto",
+  });
   // open the player info form
   $("#playersInfoForm").addClass("active");
 });
 
 // single player button click event handler
 $("#singlePlayerBtn").on("click", function() {
-  // update business logic variable
   game.singlePlayer = true;
 
   // close the game type modal
@@ -326,6 +344,6 @@ $("#singlePlayerBtn").on("click", function() {
     "opacity": 0.2,
     "pointer-events": "none",
   });
-  // show a user playerInfoForm
+  // display the user playerInfoForm
   $("#playersInfoForm").addClass("active");
 });

@@ -1,15 +1,21 @@
 // 1. set the game board
 const board = {
   gameBoard: [],
+  // default board size 3
   boardSize: 3,
+  // number of tokens in a row to win
+  numberToWin: 3,
 
-  // create a game board and fill it with an empty string
+  // create the game board and initialise each cell with an empty string
   initialise: function(size) {
     // reset the gameBoard array
     this.gameBoard = [];
-    // set the board size. if argument is not exist, it'll use former of "boardSize"
+    // set the board size. if argument not given, it'll use "boardSize" property
     this.boardSize = size || this.boardSize;
+    // set the number of tokens needed in a row to win depending on boardSize
+    this.numberToWin = this.boardSize > 4 ? 4 : 3;
 
+    // generate 2D array filling it with empty strings
     for(let i=0; i<this.boardSize; i++) {
       let rowArr = new Array(this.boardSize).fill("");
     
@@ -19,22 +25,19 @@ const board = {
 
   // mark the token on the "gameBoard" array 
   mark: function(row, column, player) {
-    // if target position is already filled with token, return false
+    // if target position is already filled, return false
     if(this.gameBoard[row][column] !== "") {
       return false;
     }
 
     this.gameBoard[row][column] = player.token;
   },
-
-  getMatchingNumber: function() {
-    return this.boardSize > 4 ? 4 : 3;
-  }
 }
 
 
 // 2. set players
 const player = {
+  // default players info
   players: {
     player1: {
       id: 1,
@@ -48,7 +51,7 @@ const player = {
     }
   },
 
-  // update "players" object with user input
+  // update "players" object with the user input
   changePlayersName: function(player1Name, player2Name) {
     this.players.player1.name = player1Name;
     this.players.player2.name = player2Name;
@@ -65,7 +68,9 @@ const player = {
 const game = {
   // set a default current player
   currentPlayer: player.players.player1,
+  // to check if a user is playing with the AI
   singlePlayer: true,
+  // to keep count of the number of games played (to determine draw)
   gameCounter: 0,
 
   swapPlayer: function() {
@@ -76,188 +81,220 @@ const game = {
     }
   },
 
-  iterateRowsAndColumns: function(matchingNumber) {
+  iterateRows: function() {
     const currentBoard = board.gameBoard;
 
-    let currentROW = currentBoard[0][0];
-    let currentCOL = currentBoard[0][0];
+    // reference cell to start
+    let ref = currentBoard[0][0];
 
-
-    // 1. check rows and columns
+    // iterate through each row
     for(let i=0; i<currentBoard.length; i++) {
 
-      let answerTrackerROW = [];
-      let answerTrackerCOL = [];
+      // to track the cells that matched in a row
+      let answerTracker = [];
 
-      let counterCOL = 0;
-      let counterROW = 0;
+      // to count how many cells matched
+      let counter = 0;
 
+      // iterate through each column
       for(let j=0; j<currentBoard.length; j++) {
-        // 1-1. check rows
-        // if current is "" or is not matched with the current cell, 
-        // reset the counter and move the current to the next cell.
-        if(currentROW === "" || currentROW !== currentBoard[i][j]) {
-          // reset the counter and answerTracker for the next column check
-          counterROW = 0;
-          answerTrackerROW = [];
 
-          // move to the next column
-          currentROW = currentBoard[i][j];
+        // if ref is "" or is not matched with the current cell, 
+        // reset the counter and move the ref to the next cell.
+        if(ref === "" || ref !== currentBoard[i][j]) {
+          // reset the counter and answerTracker for the next column check
+          counter = 0;
+          answerTracker = [];
+
+          // move the ref to the next column
+          ref = currentBoard[i][j];
         } 
 
-        if(currentROW === currentBoard[i][j]) {
-          // add counter
-          counterROW++;
-          // push the current combination to the "answerTracker"
-          answerTrackerROW.push([i, j]);
+        if(ref === currentBoard[i][j]) {
+          counter++;
+          // push the current position to the "answerTracker"
+          answerTracker.push([i, j]);
 
-          // if the counter is 3 (3 cells are matched in a row), return answerTracker
-          if(counterROW === matchingNumber) {
-            return answerTrackerROW;
-          }
-
-        }
-  
-        // 1-2. check columns
-        if(currentCOL === "" || currentCOL !== currentBoard[j][i]) {
-          counterCOL = 0;
-          answerTrackerCOL = [];
-          currentCOL = currentBoard[j][i];
-        }
-        
-        if(currentCOL === currentBoard[j][i]){
-          counterCOL++;
-          answerTrackerCOL.push([j, i]);
-
-          if(counterCOL === matchingNumber) {
-            return answerTrackerCOL;
+          // if the counter gets to "board.numberToWin" (eg. 3 cells are matched in a row), return answerTracker
+          if(counter === board.numberToWin) {
+            return answerTracker;
           }
         }
       }
     }
-
+    // if 
     return false;
   },
 
-  iterateDiagonals: function(matchingNumber) {
+  iterateColumns: function() {
     const currentBoard = board.gameBoard;
 
-    current_rightTop = currentBoard[0][0];
-    current_rightBottom = currentBoard[0][0];
+    let ref = currentBoard[0][0];
 
-    let boardSize = currentBoard.length;
-    let diagonalLines = (boardSize + boardSize) - 1
-    let longestDiagonalLine = (diagonalLines / 2) + 1
-    let itemsInDiagonal = 0;
+    for(let i=0; i<currentBoard.length; i++) {
+      let answerTracker = [];
+      let counter = 0;
+
+      for(let j=0; j<currentBoard.length; j++) {
+        if(ref === "" || ref !== currentBoard[j][i]) {
+          counter = 0;
+          answerTracker = [];
+          ref = currentBoard[j][i];
+        }
+        
+        if(ref === currentBoard[j][i]){
+          counter++;
+          answerTracker.push([j, i]);
+
+          if(counter === board.numberToWin) {
+            return answerTracker;
+          }
+        }
+      }
+    }
+    return false;
+  },
+
+  // it iterates diagonally from bottom left to top right
+  iterateDiagonals1: function() {
+    const currentBoard = board.gameBoard;
+
+    const boardSize = currentBoard.length;
+    const diagonalLines = (boardSize * 2) - 1;
+    const midLine = (diagonalLines / 2) + 1;
+    let cellsInDiagonal = 0;
+
+    let ref = currentBoard[0][0];
 
     for (let i = 1; i <= diagonalLines; i++) {
-      // variables to define their current looping cell
-      let row_rightTop;
-      let row_rightBottom;
-      let column_rightTop;
-      let column_rightBottom;
+      let row;
+      let column;
 
-      // if counter gets to 3, it'll return answer
-      let counter_rightTop = 0;
-      let counter_rightBottom = 0;
+      let counter = 0;
+      let answerTracker = [];
 
-      // variables to store cells positions they passed
-      let answerTracker_rightTop = [];
-      let answerTracker_rightBottom = [];
+      if (i <= midLine) {
+        // cells in diagonal go up by 1 up to midLine
+        cellsInDiagonal++;
 
-      if (i <= longestDiagonalLine) {
-        itemsInDiagonal++;
-        for (let j = 0; j < itemsInDiagonal; j++) {
-          // 1-a. iterate cells right up from 0 to mid
-          row_rightTop = (i - j) - 1;
-          column_rightTop = j;
+        // iterate each cell diagonally
+        for (let j = 0; j < cellsInDiagonal; j++) {
 
-          // if "current" is not marked, OR if "current" is not matched with the cell,
-          if(current_rightTop === "" || current_rightTop !== currentBoard[row_rightTop][column_rightTop]) {
+          row = i - j - 1;
+          column = j;
+
+          // if ref is "", OR if ref is not matched with the cell currently being checked
+          if(ref === "" || ref !== currentBoard[row][column]) {
             // reset counter and answer tracker
-            counter_rightTop = 0;
-            answerTracker_rightTop = [];
-            // and move "current" to the cell that is looping now
-            current_rightTop = currentBoard[row_rightTop][column_rightTop];
+            counter = 0;
+            answerTracker = [];
+            // and move ref to the cell currently being checked
+            ref = currentBoard[row][column];
           }
       
-          // if "current" is matched to the cell
-          if(current_rightTop === currentBoard[row_rightTop][column_rightTop]) {
-            // add counter
-            counter_rightTop++;
+          // if ref is matched to the cell
+          if(ref === currentBoard[row][column]) {
+            counter++;
             // push the position value in answer array
-            answerTracker_rightTop.push([row_rightTop, column_rightTop]);
+            answerTracker.push([row, column]);
     
             // if the counter is 3, it means they found 3 same tokens in a row 
-            if(counter_rightTop === matchingNumber) {
-              return answerTracker_rightTop;
-            }
-          }
-
-          // 2-a. iterate cells right dowm from 0 to mid
-          row_rightBottom = boardSize - (i - j);
-          column_rightBottom = j;
-
-          if(current_rightBottom === "" || current_rightBottom !== currentBoard[row_rightBottom][column_rightBottom]) {
-            counter_rightBottom = 0;
-            answerTracker_rightBottom = [];
-            current_rightBottom = currentBoard[row_rightBottom][column_rightBottom];
-          }
-
-          if(current_rightBottom === currentBoard[row_rightBottom][column_rightBottom]) {
-            counter_rightBottom++;
-            answerTracker_rightBottom.push([row_rightBottom, column_rightBottom]);
-    
-            if(counter_rightBottom === matchingNumber) {
-              return answerTracker_rightBottom;
+            if(counter === board.numberToWin) {
+              return answerTracker;
             }
           }
         }
       } else {
-        itemsInDiagonal--;
+        // if it's grater than the midLine, then number of cells in diagonal decrease by 1 every time
+        cellsInDiagonal--;
 
-        for (let j = 0; j < itemsInDiagonal; j++) {
-          // 1-b. iterate cells right top from mid - last
-          row_rightTop = boardSize - 1 - j;
-          column_rightTop = i + j - boardSize;
+        for (let j = 0; j < cellsInDiagonal; j++) {
 
-          if(current_rightTop === "" || current_rightTop !== currentBoard[row_rightTop][column_rightTop]) {
-            counter_rightTop = 0;
-            answerTracker_rightTop = [];
-            current_rightTop = currentBoard[row_rightTop][column_rightTop];
+          row = boardSize - 1 - j;
+          column = i + j - boardSize;
+
+          if(ref === "" || ref !== currentBoard[row][column]) {
+            counter = 0;
+            answerTracker = [];
+            ref = currentBoard[row][column];
           }
       
-          if(current_rightTop === currentBoard[row_rightTop][column_rightTop]) {
-            counter_rightTop++;
-            answerTracker_rightTop.push([row_rightTop, column_rightTop]);
+          if(ref === currentBoard[row][column]) {
+            counter++;
+            answerTracker.push([row, column]);
     
-            if(counter_rightTop === matchingNumber) {
-              return answerTracker_rightTop;
-            }
-          }
-
-          // 2-b. iterate cells right bottom
-          row_rightBottom = boardSize - 1 - j;
-          column_rightBottom = 2 * boardSize - i - j - 1;
-
-          if(current_rightBottom === "" || current_rightBottom !== currentBoard[column_rightBottom][row_rightBottom]) {
-            counter_rightBottom = 0;
-            answerTracker_rightBottom = [];
-            current_rightBottom = currentBoard[column_rightBottom][row_rightBottom];
-          }
-      
-          if(current_rightBottom === currentBoard[column_rightBottom][row_rightBottom]) {
-            counter_rightBottom++;
-            answerTracker_rightBottom.push([column_rightBottom, row_rightBottom]);
-    
-            if(counter_rightBottom === matchingNumber) {
-              return answerTracker_rightBottom;
+            if(counter === board.numberToWin) {
+              return answerTracker;
             }
           }
         }
       }
     }
+    return false;
+  },
 
+  // it iterates diagonally from top left to bottom right
+  iterateDiagonals2: function() {
+    const currentBoard = board.gameBoard;
+    const boardSize = currentBoard.length;
+    const diagonalLines = (boardSize + boardSize) - 1
+    const midLine = (diagonalLines / 2) + 1
+    let cellsInDiagonal = 0;
+
+    let ref = currentBoard[0][0];
+
+    for (let i = 1; i <= diagonalLines; i++) {
+      let row;
+      let column;
+      let counter = 0;
+      let answerTracker = [];
+
+      if (i <= midLine) {
+        cellsInDiagonal++;
+
+        for (let j = 0; j < cellsInDiagonal; j++) {
+          row = boardSize - (i - j);
+          column = j;
+
+          if(ref === "" || ref !== currentBoard[row][column]) {
+            counter = 0;
+            answerTracker = [];
+            ref = currentBoard[row][column];
+          }
+
+          if(ref === currentBoard[row][column]) {
+            counter++;
+            answerTracker.push([row, column]);
+    
+            if(counter === board.numberToWin) {
+              return answerTracker;
+            }
+          }
+        }
+      } else {
+        cellsInDiagonal--;
+
+        for (let j = 0; j < cellsInDiagonal; j++) {
+          row = boardSize - 1 - j;
+          column = 2 * boardSize - i - j - 1;
+
+          if(ref === "" || ref !== currentBoard[column][row]) {
+            counter = 0;
+            answerTracker = [];
+            ref = currentBoard[column][row];
+          }
+      
+          if(ref === currentBoard[column][row]) {
+            counter++;
+            answerTracker.push([column, row]);
+    
+            if(counter === board.numberToWin) {
+              return answerTracker;
+            }
+          }
+        }
+      }
+    }
     return false;
   },
 
@@ -265,33 +302,47 @@ const game = {
     // checkWin will run every time when the players actually mark the gameBoard.
     this.gameCounter++;
 
-    const matchingItemNumber = board.getMatchingNumber();
-
-    if(this.iterateRowsAndColumns(matchingItemNumber) !== false) {
-      return this.iterateRowsAndColumns(matchingItemNumber);
+    // check win conditions by iterating through the board,
+    // if it has a winner, it will return the array with the winning positions to update UI
+    const rowCheck = this.iterateRows();
+    if(rowCheck !== false) {
+      return rowCheck;
     }
 
-    if(this.iterateDiagonals(matchingItemNumber) !== false) {
-      return this.iterateDiagonals(matchingItemNumber);
+    const columnCheck = this.iterateColumns();
+    if(columnCheck !== false) {
+      return columnCheck;
+    }
+
+    const diagonalCheck1 = this.iterateDiagonals1();
+    if(diagonalCheck1 !== false) {
+      return diagonalCheck1;
+    }
+
+    const diagonalCheck2 = this.iterateDiagonals2();
+    if(diagonalCheck2 !== false) {
+      return diagonalCheck2;
     }
   },
 
   checkDraw: function() {
     const totalCells = Math.pow(parseInt(board.gameBoard.length), 2);
-    // if the players play games as many time as totalCells - 1, the game is drawn
+    // if the players play games as many time as totalCells - 1 without winning conditions, the game is drawn
     if(this.gameCounter >= totalCells -1) {
       return true;
     }
   },
 }
 
+
+// 4. AI
 const AI = {
   isEmptyCell: function(row, column) {
     return board.gameBoard[row][column] === "" ? true : false;
   },
 
   isValidCell: function(row, column) {
-    if(row >= board.boardSize - 1 || column >= board.boardSize - 1) {
+    if(row >= board.boardSize || column >= board.boardSize) {
       return false;
     }else {
       return true;
@@ -299,248 +350,255 @@ const AI = {
   },
 
   generateRandomPosition: function() {
-    const row = parseInt(Math.random() * board.boardSize);
-    const column = parseInt(Math.random() * board.boardSize);
+    // this will generate random number between 0 and boardSize
+    const row = Math.floor(Math.random() * board.boardSize);
+    const column = Math.floor(Math.random() * board.boardSize);
 
+    // if the position is already taken, 
+    // run this function again to find different value
     if(!this.isEmptyCell(row, column)) {
       return this.generateRandomPosition();
     }else {
+      // if it's valid, return the position
       return [row, column];
     }
   },
 
-  iterateRowsAndColumns: function(matchingNumber) {
+  iterateRows: function() {
+    const nextPositions = [];
+
     const currentBoard = board.gameBoard;
 
-    let currentROW = currentBoard[0][0];
-    let currentCOL = currentBoard[0][0];
+    let ref = currentBoard[0][0];
 
-    const nextPosition = {
-      first: [],
-      second: []
-    }
-
-
-    // 1. check rows and columns
     for(let i=0; i<currentBoard.length; i++) {
-
-      let counterCOL = 0;
-      let counterROW = 0;
+      let counter = 0;
 
       for(let j=0; j<currentBoard.length; j++) {
-        // 1-1. check rows
-        // if current is "" or is not matched with the current cell, 
-        // reset the counter and move the current to the next cell.
-        if(currentROW === "" || currentROW !== currentBoard[i][j]) {
-          // reset the counter and answerTracker for the next column check
-          counterROW = 0;
-          // move to the next column
-          currentROW = currentBoard[i][j];
+        if(ref === "" || ref !== currentBoard[i][j]) {
+          counter = 0;
+          ref = currentBoard[i][j];
         } 
 
-        if(currentROW === currentBoard[i][j]) {
-          // add counter
-          counterROW++;
+        if(ref === currentBoard[i][j]) {
+          counter++;
 
-
-          if(counterROW === matchingNumber - 1) {
-            nextPosition.first.push([i, j+1]);
-          }
-          if(counterROW === matchingNumber - 2) {
-            nextPosition.second.push([i, j+1]);
-          }
-        }
-  
-        // 1-2. check columns
-        if(currentCOL === "" || currentCOL !== currentBoard[j][i]) {
-          counterCOL = 0;
-          currentCOL = currentBoard[j][i];
-        }
-        
-        if(currentCOL === currentBoard[j][i]){
-          counterCOL++;
-
-          if(counterCOL === matchingNumber - 2) {
-            nextPosition.first.push([j+1, i]);
-          }
-          if(counterCOL === matchingNumber - 1) {
-            nextPosition.second.push([j+1, i]);
+          if(counter === board.numberToWin-1) {
+            // push the cell's position that can lead to a win
+            nextPositions.push([i, j+1]);
           }
         }
       }
     }
-
-    return nextPosition;
+    // return array of positions
+    return nextPositions;
   },
 
-  iterateDiagonals: function(matchingNumber) {
+  iterateColumns: function() {
+    const nextPositions = [];
+
     const currentBoard = board.gameBoard;
 
-    const nextPosition = {
-      first: [],
-      second: []
+    let ref = currentBoard[0][0];
+
+    for(let i=0; i<currentBoard.length; i++) {
+      let counter = 0;
+
+      for(let j=0; j<currentBoard.length; j++) {
+        if(ref === "" || ref !== currentBoard[j][i]) {
+          counter = 0;
+          ref = currentBoard[j][i];
+        }
+        
+        if(ref === currentBoard[j][i]){
+          counter++;
+
+          if(counter === board.numberToWin - 1) {
+            nextPositions.push([j+1, i])
+          }
+        }
+      }
     }
+    return nextPositions;
+  },
 
-    current_rightTop = currentBoard[0][0];
-    current_rightBottom = currentBoard[0][0];
+  iterateDiagonals1: function() {
+    const nextPositions = [];
 
-    let boardSize = currentBoard.length;
-    let diagonalLines = (boardSize + boardSize) - 1
-    let longestDiagonalLine = (diagonalLines / 2) + 1
-    let itemsInDiagonal = 0;
+    const currentBoard = board.gameBoard;
+
+    const boardSize = currentBoard.length;
+    const diagonalLines = (boardSize * 2) - 1
+    const midLine = (diagonalLines / 2) + 1
+    let cellsInDiagonal = 0;
+
+    let ref = currentBoard[0][0];
 
     for (let i = 1; i <= diagonalLines; i++) {
-      // variables to define their current looping cell
-      let row_rightTop;
-      let row_rightBottom;
-      let column_rightTop;
-      let column_rightBottom;
+      let row;
+      let column;
+      let counter = 0;
 
-      // if counter gets to 3, it'll return answer
-      let counter_rightTop = 0;
-      let counter_rightBottom = 0;
+      if (i <= midLine) {
+        cellsInDiagonal++;
 
-      if (i <= longestDiagonalLine) {
-        itemsInDiagonal++;
-        for (let j = 0; j < itemsInDiagonal; j++) {
-          // 1-a. iterate cells right up from 0 to mid
-          row_rightTop = (i - j) - 1;
-          column_rightTop = j;
+        for (let j = 0; j < cellsInDiagonal; j++) {
+          row = (i - j) - 1;
+          column = j;
 
-          // if "current" is not marked, OR if "current" is not matched with the cell,
-          if(current_rightTop === "" || current_rightTop !== currentBoard[row_rightTop][column_rightTop]) {
-            // reset counter and answer tracker
-            counter_rightTop = 0;
-            // and move "current" to the cell that is looping now
-            current_rightTop = currentBoard[row_rightTop][column_rightTop];
+          if(ref === "" || ref !== currentBoard[row][column]) {
+            counter = 0;
+            ref = currentBoard[row][column];
           }
       
-          // if "current" is matched to the cell
-          if(current_rightTop === currentBoard[row_rightTop][column_rightTop]) {
-            // add counter
-            counter_rightTop++;
+          if(ref === currentBoard[row][column]) {
+            counter++;
     
-            if(counter_rightTop === matchingNumber - 1) {
-              nextPosition.first.push([row_rightTop + 1, column_rightTop + 1])
-            }
-            if(counter_rightTop === matchingNumber - 2) {
-              nextPosition.second.push([row_rightTop + 1, column_rightTop + 1])
-            }
-          }
-
-          // 2-a. iterate cells right dowm from 0 to mid
-          row_rightBottom = boardSize - (i - j);
-          column_rightBottom = j;
-
-          if(current_rightBottom === "" || current_rightBottom !== currentBoard[row_rightBottom][column_rightBottom]) {
-            counter_rightBottom = 0;
-            current_rightBottom = currentBoard[row_rightBottom][column_rightBottom];
-          }
-
-          if(current_rightBottom === currentBoard[row_rightBottom][column_rightBottom]) {
-            counter_rightBottom++;
-    
-            if(counter_rightBottom === matchingNumber - 1) {
-              nextPosition.first.push([row_rightBottom + 1, column_rightBottom + 1])
-            }
-            if(counter_rightBottom === matchingNumber - 2) {
-              nextPosition.second.push([row_rightBottom + 1, column_rightBottom + 1])
+            if(counter === board.numberToWin - 1) {
+              nextPositions.push([row+1, column+1]);
             }
           }
         }
       } else {
-        itemsInDiagonal--;
+        cellsInDiagonal--;
 
-        for (let j = 0; j < itemsInDiagonal; j++) {
-          // 1-b. iterate cells right top from mid - last
-          row_rightTop = boardSize - 1 - j;
-          column_rightTop = i + j - boardSize;
+        for (let j = 0; j < cellsInDiagonal; j++) {
+          row = boardSize - 1 - j;
+          column = i + j - boardSize;
 
-          if(current_rightTop === "" || current_rightTop !== currentBoard[row_rightTop][column_rightTop]) {
-            counter_rightTop = 0;
-            current_rightTop = currentBoard[row_rightTop][column_rightTop];
+          if(ref === "" || ref !== currentBoard[row][column]) {
+            counter = 0;
+            ref = currentBoard[row][column];
           }
       
-          if(current_rightTop === currentBoard[row_rightTop][column_rightTop]) {
-            counter_rightTop++;
+          if(ref === currentBoard[row][column]) {
+            counter++;
     
-            if(counter_rightTop === matchingNumber - 1) {
-              nextPosition.first.push([row_rightTop + 1, column_rightTop + 1])
-            }
-            if(counter_rightTop === matchingNumber - 2) {
-              nextPosition.second.push([row_rightTop + 1, column_rightTop + 1])
-            }
-          }
-
-          // 2-b. iterate cells right bottom
-          row_rightBottom = boardSize - 1 - j;
-          column_rightBottom = 2 * boardSize - i - j - 1;
-
-          if(current_rightBottom === "" || current_rightBottom !== currentBoard[column_rightBottom][row_rightBottom]) {
-            counter_rightBottom = 0;
-            answerTracker_rightBottom = [];
-            current_rightBottom = currentBoard[column_rightBottom][row_rightBottom];
-          }
-      
-          if(current_rightBottom === currentBoard[column_rightBottom][row_rightBottom]) {
-            counter_rightBottom++;
-            answerTracker_rightBottom.push([column_rightBottom, row_rightBottom]);
-    
-            if(counter_rightBottom === matchingNumber - 1) {
-              nextPosition.first.push([column_rightBottom + 1, row_rightBottom + 1])
-            }
-            if(counter_rightBottom === matchingNumber - 2) {
-              nextPosition.second.push([column_rightBottom + 1, row_rightBottom + 1])
+            if(counter === board.numberToWin - 1) {
+              nextPositions.push([row+1, column+1]);
             }
           }
         }
       }
     }
+    return nextPositions;
+  },
 
-    return nextPosition;
+  iterateDiagonals2: function() {
+    const nextPositions = [];
+
+    const currentBoard = board.gameBoard;
+    const boardSize = currentBoard.length;
+    const diagonalLines = (boardSize + boardSize) - 1
+    const midLine = (diagonalLines / 2) + 1
+    let cellsInDiagonal = 0;
+
+    let ref = currentBoard[0][0];
+
+    for (let i = 1; i <= diagonalLines; i++) {
+      let row;
+      let column;
+      let counter = 0;
+
+      if (i <= midLine) {
+        cellsInDiagonal++;
+
+        for (let j = 0; j < cellsInDiagonal; j++) {
+          row = boardSize - (i - j);
+          column = j;
+
+          if(ref === "" || ref !== currentBoard[row][column]) {
+            counter = 0;
+            ref = currentBoard[row][column];
+          }
+
+          if(ref === currentBoard[row][column]) {
+            counter++;
+    
+            if(counter === board.numberToWin - 1) {
+              nextPositions.push([row+1, column+1])
+            }
+          }
+        }
+      } else {
+        cellsInDiagonal--;
+
+        for (let j = 0; j < cellsInDiagonal; j++) {
+          row = boardSize - 1 - j;
+          column = 2 * boardSize - i - j - 1;
+
+          if(ref === "" || ref !== currentBoard[column][row]) {
+            counter = 0;
+            ref = currentBoard[column][row];
+          }
+      
+          if(ref === currentBoard[column][row]) {
+            counter++;
+    
+            if(counter === board.numberToWin - 1) {
+              nextPositions.push([row+1, column+1])
+            }
+          }
+        }
+      }
+    }
+    return nextPositions;
+  },
+
+  getPositionToWin: function(positionsArr) {
+    if(positionsArr.length !== 0) {
+      for(let position of positionsArr) {
+        // if the position in the array is valid, return it
+        if(this.isValidCell(position[0], position[1]) && this.isEmptyCell(position[0], position[1])) {
+          return position;
+        }
+      }
+    }
+    return false;
   },
 
   chooseCell: function() {
+    // if the board is empty, put the token in random position
     if(game.gameCounter === 0) {
       return this.generateRandomPosition();
     }
 
-    const matchingItemNumber = board.getMatchingNumber();
+    // to check if any items in the array are valid
+    let check1 = false;
+    let check2 = false;
+    let check3 = false;
+    let check4 = false;
 
-    const nextPositionRC = this.iterateRowsAndColumns(matchingItemNumber);
-    const nextPositionDG = this.iterateDiagonals(matchingItemNumber);
-
-    // 1. check if the position is not marked
-    for(let position of nextPositionRC.first){
-      // if its not marked, return it
-      if(this.isValidCell(position[0], position[1]) && this.isEmptyCell(position[0], position[1])) {
-        return position;
-      }
+    // get the array of positions that could result in a win for both players
+    const rowArr = this.iterateRows();
+    // and iterate the array to find valid position among them
+    check1 = this.getPositionToWin(rowArr);
+    // if there is a valid position, return the position
+    if (check1){
+      return check1;
     }
 
-    // 2. diagonal checking
-    for(let position of nextPositionDG.first){
-      // if its not marked, return it
-      if(this.isValidCell(position[0], position[1]) && this.isEmptyCell(position[0], position[1])) {
-        return position;
-      }
+    const columnArr = this.iterateColumns();
+    check2 = this.getPositionToWin(columnArr);
+    if (check2){
+      return check2;
     }
 
-    // 3. if there was nothing in , 
-    for(let position of nextPositionRC.second){
-      // if its not marked, return it
-      if(this.isValidCell(position[0], position[1]) && this.isEmptyCell(position[0], position[1])) {
-        return position;
-      }
+    const diagonalArr1 = this.iterateDiagonals1();
+    check3 = this.getPositionToWin(diagonalArr1);
+    if (check3){
+      return check3;
     }
 
-    for(let position of nextPositionDG.second){
-      // if its not marked, return it
-      if(this.isValidCell(position[0], position[1]) && this.isEmptyCell(position[0], position[1])) {
-        return position;
-      }
+    const diagonalArr2 = this.iterateDiagonals2();
+    check4 = this.getPositionToWin(diagonalArr2);
+    if (check4){
+      return check4;
     }
 
+    console.log({rowArr, columnArr, diagonalArr1, diagonalArr2})
+
+    // if there is no winning positions, return a random position
     return this.generateRandomPosition();
   }
 }
