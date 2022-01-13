@@ -25,6 +25,7 @@ const DOM = {
 
     // connect to the event handler
     $("#board > div").on("click", function() {
+
       const row = $(this).attr("data-row");
       const column = $(this).attr("data-column");
 
@@ -153,6 +154,8 @@ const DOM = {
     setTimeout(function() {
       // get the position from logic part
       const position = AI.chooseCell();
+
+      console.log(`Robot choose ${position}`)
       // and click the board
       DOM.clickBoard(position[0], position[1]);
     }, 1000)
