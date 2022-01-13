@@ -2,7 +2,7 @@
 
 A simple NxN Tic Tac Toe game. Play against a friend or an AI. This was built as part of GA project.
 
-**[Click here to play in live.](https://jiasong214.github.io/tic-tac-toe/)**
+**[Click here to play](https://jiasong214.github.io/tic-tac-toe/)**
 
 ## Features
 
