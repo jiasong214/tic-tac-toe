@@ -127,7 +127,6 @@ const game = {
         }
       }
     }
-    // if 
     return false;
   },
 
@@ -167,6 +166,7 @@ const game = {
     const boardSize = currentBoard.length;
     const diagonalLines = (boardSize * 2) - 1;
     const midLine = (diagonalLines / 2) + 1;
+
     let cellsInDiagonal = 0;
 
     let ref = currentBoard[0][0];
@@ -214,9 +214,9 @@ const game = {
         cellsInDiagonal--;
 
         for (let j = 0; j < cellsInDiagonal; j++) {
-
           row = boardSize - 1 - j;
           column = i + j - boardSize;
+   
 
           if(ref === "" || ref !== currentBoard[row][column]) {
             counter = 0;
@@ -333,7 +333,7 @@ const game = {
   checkDraw: function() {
     const totalCells = Math.pow(parseInt(board.gameBoard.length), 2);
     // if the players play games as many time as totalCells without winning move, the game is drawn
-    if(this.gameCounter >= totalCells ) {
+    if(this.gameCounter === totalCells ) {
       return true;
     }
   },
@@ -377,20 +377,27 @@ const AI = {
     let ref = currentBoard[0][0];
 
     for(let i=0; i<currentBoard.length; i++) {
+      let answerTracker = [];
       let counter = 0;
 
       for(let j=0; j<currentBoard.length; j++) {
         if(ref === "" || ref !== currentBoard[i][j]) {
           counter = 0;
+          answerTracker = [];
           ref = currentBoard[i][j];
         } 
 
         if(ref === currentBoard[i][j]) {
           counter++;
+          answerTracker.push([i, j]);
 
           if(counter === board.numberToWin-1) {
             // push the cell's position that can lead to a win
-            nextPositions.push([i, j+1]);
+            // one before the first item of answer tracker and one after
+            nextPositions.push(
+              [answerTracker[0][0], answerTracker[0][1]-1],
+              [answerTracker[answerTracker.length-1][0], answerTracker[answerTracker.length-1][1]+1]
+            )
           }
         }
       }
@@ -575,7 +582,7 @@ const AI = {
         if(currentBoard[i][j] !== "") {
           const closeCells = [
             [i, j-1], [i, j+1], [i-1, j], [i+1, j], [i-1, j-1], [i+1, j+1], [i-1, j+1], [i+1, j-1]
-          ]
+          ];
           // and push random close cell
           closePositionsArr.push(closeCells[randomIndex]);
         }

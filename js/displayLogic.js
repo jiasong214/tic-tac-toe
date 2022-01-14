@@ -25,7 +25,6 @@ const DOM = {
 
     // connect to the click event handler
     $("#board > div").on("click", function() {
-
       const row = $(this).attr("data-row");
       const column = $(this).attr("data-column");
 
@@ -102,6 +101,18 @@ const DOM = {
     });
   },
 
+  openTheGameSettingScreen: function(delay) {
+    // clear the local storage
+    DOM.clearTheLocalStorageData();
+    // activate the game setting screen
+    $("#gameSettingScreen").addClass("active");
+    // delay for animation
+    setTimeout(() => {
+      $(".gameTypeButtons-wrapper").addClass("active");
+    }, delay);
+    $("#playersInfoForm").removeClass("active");
+  },
+
   clickBoard: function(row, column) {
     // get the current player from the business part
     const currentPlayer = game.currentPlayer;
@@ -118,9 +129,10 @@ const DOM = {
     this.markGameBoard(row, column, currentPlayer);
 
     // 3. check the game result
-    if(game.checkWin() !== undefined) {
-      // get the cell positions
-      const winningPositionsArr = game.checkWin();
+    // get the winning cell positions
+    const winningPositionsArr = game.checkWin();
+
+    if(winningPositionsArr !== undefined) {
       // and mark in the DOM with it
       this.markResultOnGameBoard(winningPositionsArr);
       // and display winner
@@ -167,18 +179,6 @@ const DOM = {
     }, 500);
   },
 
-  bringTheGameSettingScreen: function(delay) {
-    // clear the local storage
-    DOM.clearTheLocalStorageData();
-    // activate the game setting screen
-    $("#gameSettingScreen").addClass("active");
-    // delay for animation
-    setTimeout(() => {
-      $(".gameTypeButtons-wrapper").addClass("active");
-    }, delay);
-    $("#playersInfoForm").removeClass("active");
-  },
-
   // this will run every time when a user clicks the gameBoard
   saveInLocalStorage: function() {
     const gameData = {
@@ -219,7 +219,6 @@ const DOM = {
     game.gameCounter = gameData.game.gameCounter;
     game.currentPlayer = gameData.game.currentPlayer;
     game.singlePlayer = gameData.game.singlePlayer;
-
     board.setNumberToWin();
 
     // and draw game board with those
@@ -256,7 +255,7 @@ $(document).ready(function() {
   const LSData = DOM.getLocalStorageData();
 
   if(LSData === false) {
-    DOM.bringTheGameSettingScreen();
+    DOM.openTheGameSettingScreen();
   }
 
   DOM.updatePlayersInfo();
@@ -269,18 +268,34 @@ $(document).ready(function() {
   }
 });
 
-// playAgain button click event handler
-$("#playAgainBtn").on("click", function() {
-  resetGameBoard();
+// multiplayer button click event handler
+$("#multiplayerBtn").on("click", function() {
+  // save game type in logic part
+  game.singlePlayer = false;
+
+  // close the game-type modal
+  $(".gameTypeButtons-wrapper").removeClass("active");
+  $(".playersInfoForm__player2").css({
+    "opacity": 1,
+    "pointer-events": "auto",
+  });
+  // open the player info form
+  $("#playersInfoForm").addClass("active");
 });
 
-// newGame button click event handler
-$("#playNewGameBtn").on("click", function() {
-  DOM.bringTheGameSettingScreen(1500);
-});
+// single player button click event handler
+$("#singlePlayerBtn").on("click", function() {
+  game.singlePlayer = true;
 
-$("#exitBtn").on("click", function() {
-  DOM.bringTheGameSettingScreen(1500);
+  // close the game type modal
+  $(".gameTypeButtons-wrapper").removeClass("active");
+  // block the player2 inputs
+  $(".playersInfoForm__player2").css({
+    "opacity": 0.2,
+    "pointer-events": "none",
+  });
+  // display the user playerInfoForm
+  $("#playersInfoForm").addClass("active");
 });
 
 // form submit event handler
@@ -320,32 +335,16 @@ $("#playersInfoForm").on("submit", function(event) {
   $("#playersInfoForm").removeClass("active");
 });
 
-// multiplayer button click event handler
-$("#multiplayerBtn").on("click", function() {
-  // save game type in logic part
-  game.singlePlayer = false;
-
-  // close the game-type modal
-  $(".gameTypeButtons-wrapper").removeClass("active");
-  $(".playersInfoForm__player2").css({
-    "opacity": 1,
-    "pointer-events": "auto",
-  });
-  // open the player info form
-  $("#playersInfoForm").addClass("active");
+// playAgain button click event handler
+$("#playAgainBtn").on("click", function() {
+  resetGameBoard();
 });
 
-// single player button click event handler
-$("#singlePlayerBtn").on("click", function() {
-  game.singlePlayer = true;
+// newGame button click event handler
+$("#playNewGameBtn").on("click", function() {
+  DOM.openTheGameSettingScreen(1500);
+});
 
-  // close the game type modal
-  $(".gameTypeButtons-wrapper").removeClass("active");
-  // block the player2 inputs
-  $(".playersInfoForm__player2").css({
-    "opacity": 0.2,
-    "pointer-events": "none",
-  });
-  // display the user playerInfoForm
-  $("#playersInfoForm").addClass("active");
+$("#exitBtn").on("click", function() {
+  DOM.openTheGameSettingScreen(1500);
 });
